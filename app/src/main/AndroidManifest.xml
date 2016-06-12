@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.jdelorenzo.hitthegym" >
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:fullBackupContent="@xml/backup_scheme"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.jdelorenzo.hitthegym.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.SlideAnimation" >
+        </activity>
+        <activity
+            android:name="com.jdelorenzo.hitthegym.WorkoutActivity"
+            android:label="@string/title_activity_workout"
+            android:parentActivityName="com.jdelorenzo.hitthegym.MainActivity"
+            android:theme="@style/AppTheme.SlideAnimation" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jdelorenzo.hitthegym.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.jdelorenzo.hitthegym.ModifyRoutineActivity"
+            android:label="@string/title_activity_modify_workout"
+            android:parentActivityName="com.jdelorenzo.hitthegym.MainActivity"
+            android:theme="@style/AppTheme.SlideAnimation" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jdelorenzo.hitthegym.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.jdelorenzo.hitthegym.ViewStatsActivity"
+            android:label="@string/title_activity_view_stats"
+            android:parentActivityName="com.jdelorenzo.hitthegym.MainActivity"
+            android:theme="@style/AppTheme.SlideAnimation" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jdelorenzo.hitthegym.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.jdelorenzo.hitthegym.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="com.jdelorenzo.hitthegym.MainActivity"
+            android:theme="@style/AppTheme.ActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.jdelorenzo.hitthegym.MainActivity" />
+        </activity>
+        <activity
+            android:noHistory="true"
+            android:name="com.jdelorenzo.hitthegym.LoginActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.SlideAnimation" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name="com.jdelorenzo.hitthegym.data.WorkoutProvider"
+            android:authorities="@string/content_authority"
+            android:exported="false"
+            android:syncable="true" />
+
+        <service
+            android:name="com.jdelorenzo.hitthegym.service.DatabaseIntentService"
+            android:enabled="true"
+            android:exported="false" />
+
+        <receiver
+            android:enabled="true"
+            android:name="com.jdelorenzo.hitthegym.widget.WidgetProvider">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.jdelorenzo.capstoneproject.app.ACTION_DATA_UPDATED"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/workout_widget_info" />
+        </receiver>
+
+        <service
+            android:name="com.jdelorenzo.hitthegym.widget.WidgetService"
+            android:enabled="true"
+            android:exported="false"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+    </application>
+
+</manifest>

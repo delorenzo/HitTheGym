@@ -1,0 +1,12 @@
+#!/bin/sh
+
+./gradlew test
+
+RESULT=$?
+
+if [ "$RESULT" = 1 ]
+	then
+		echo "Commit failed - unit tests are failing."
+fi
+
+exit $RESULT
