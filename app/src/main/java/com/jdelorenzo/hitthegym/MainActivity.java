@@ -47,10 +47,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        String[] list = this.databaseList();
-        for (int i = 0; i < list.length; i++) {
-            Log.e(LOG_TAG, "DB" + i + ":  " + list[i]);
-        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);

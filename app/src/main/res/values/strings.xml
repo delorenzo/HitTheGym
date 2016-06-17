@@ -58,8 +58,8 @@
     <!-- notifications -->
     <string name="prefs_notifications_key" translatable="false">notifications</string>
     <string name="prefs_notifications_title">Notifications</string>
-    <string name="prefs_notifications_label_true">Receive notifications</string>
-    <string name="prefs_notifications_label_false">Do not receive notifications</string>
+    <string name="prefs_notifications_label_true">Receive workout reminders</string>
+    <string name="prefs_notifications_label_false">Do not receive workout reminders</string>
     <!-- rest -->
     <string name="prefs_rest_key">rest</string>
     <string name="prefs_rest_title">Rest Time</string>

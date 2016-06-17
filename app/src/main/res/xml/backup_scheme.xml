@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <full-backup-content>
-    <include domain="database"/>
-    <include domain="sharedpref"/>
+    <include domain="sharedpref" path="weight"/>
+    <include domain="sharedpref" path="notifications"/>
+    <include domain="sharedpref" path="rest"/>
+    <include domain="sharedpref" path="login"/>
+    <include domain="database" path="workout.db"/>
 </full-backup-content>
