@@ -173,7 +173,6 @@ public class LoginActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             firebaseAuthWithGoogle(acct);
-            Toast.makeText(this, "Authentication successful.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(this, MainActivity.class);
             if (acct != null) {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -189,15 +188,15 @@ public class LoginActivity extends AppCompatActivity implements
             // Signed out, show unauthenticated UI.
             String resultMessage = result.getStatus().getStatusMessage();
             int code = result.getStatus().getStatusCode();
-            String errorMessage = getString(R.string.authentication_generic_failure);
             if (code == GoogleSignInStatusCodes.SIGN_IN_REQUIRED) {
-                errorMessage = getString(R.string.common_google_play_services_sign_in_failed_text);
+                Toast.makeText(this, getString(R.string.common_google_play_services_sign_in_failed_text),
+                        Toast.LENGTH_SHORT).show();
             }
             else if (code == GoogleSignInStatusCodes.NETWORK_ERROR) {
-                errorMessage = getString(R.string.common_google_play_services_network_error_text);
+                Toast.makeText(this, getString(R.string.common_google_play_services_network_error_text),
+                        Toast.LENGTH_SHORT).show();
             }
             FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Google sign in unsuccessful.  Code " + code);
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -212,8 +211,6 @@ public class LoginActivity extends AppCompatActivity implements
                         Log.d(LOG_TAG, "Completed firebase sign on with Google:  " +
                                 task.isSuccessful());
                         if (!task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
                             FirebaseCrash.logcat(Log.WARN, LOG_TAG,
                                     "Firebase sign on unsuccessful:  " + task.getException());
                         }

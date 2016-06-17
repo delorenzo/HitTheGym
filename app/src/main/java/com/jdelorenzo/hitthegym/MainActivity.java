@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,17 +34,23 @@ import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements
         CreateRoutineDialogFragment.CreateRoutineDialogListener {
+
     @BindView(R.id.toolbar) Toolbar toolbar;
+    @BindViews({R.id.button_work_out, R.id.button_edit_workout, R.id.button_view_stats}) List<Button> workoutButtons;
+    @BindView(R.id.button_view_stats) Button viewStatsButton;
     private static final String FTAG_DIALOG_FRAGMENT = "CreateRoutineDialogFragment";
     String[] mRoutineLabels = new String[]{};
     long[] mRoutineIds = new long[]{};
-    @BindViews({R.id.button_work_out, R.id.button_edit_workout, R.id.button_view_stats}) List<Button> workoutButtons;
-    @BindView(R.id.button_view_stats) Button viewStatsButton;
     public static final String ARG_NAME = "name";
     private String displayName;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        String[] list = this.databaseList();
+        for (int i = 0; i < list.length; i++) {
+            Log.e(LOG_TAG, "DB" + i + ":  " + list[i]);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -51,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements
         Bundle args = getIntent().getExtras();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         displayName = sharedPreferences.getString(getString(R.string.prefs_display_name_key), "");
-        if (displayName != null && !displayName.isEmpty()) {
+        if (!displayName.isEmpty()) {
             viewStatsButton.setText(String.format(Locale.getDefault(),
                     getString(R.string.format_button_text), displayName));
         }

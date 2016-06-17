@@ -1,5 +1,6 @@
 package com.jdelorenzo.hitthegym.data;
 
+import android.app.backup.BackupManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -398,6 +399,7 @@ public class WorkoutProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(uri, null);
             }
         }
+        requestBackup();
         return rowsDeleted;
     }
 
@@ -444,6 +446,7 @@ public class WorkoutProvider extends ContentProvider {
                 getContext().getContentResolver().notifyChange(uri, null);
             }
         }
+        requestBackup();
         return rowsUpdated;
     }
 
@@ -550,7 +553,16 @@ public class WorkoutProvider extends ContentProvider {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         Log.d(LOG_TAG, "Inserted " + returnCount + " into database");
+        requestBackup();
         return returnCount;
+    }
+
+    /*
+    Notify the backup manager that data has changed.
+     */
+    private void requestBackup() {
+        BackupManager bm = new BackupManager(getContext());
+        bm.dataChanged();
     }
 
     static UriMatcher buildUriMatcher() {
