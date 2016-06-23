@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,7 +21,16 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.Logger;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateRoutineDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectRoutineDialogFragment;
@@ -34,7 +44,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements
-        CreateRoutineDialogFragment.CreateRoutineDialogListener {
+        CreateRoutineDialogFragment.CreateRoutineDialogListener,
+                GoogleApiClient.OnConnectionFailedListener{
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindViews({R.id.button_work_out, R.id.button_edit_workout, R.id.button_view_stats}) List<Button> workoutButtons;
@@ -247,8 +258,14 @@ public class MainActivity extends AppCompatActivity implements
         auth.signOut();
         //facebook sign out
         LoginManager.getInstance().logOut();
+        //TODO:  google sign out
 
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Google API Connection failed:  " + connectionResult.toString());
     }
 }

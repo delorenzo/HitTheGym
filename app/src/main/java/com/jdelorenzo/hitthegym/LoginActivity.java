@@ -42,9 +42,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.Logger;
 
 
 import butterknife.BindView;
@@ -102,11 +105,12 @@ public class LoginActivity extends AppCompatActivity implements
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    Log.d(LOG_TAG, "Signed in with :  " + user.getUid());
                     mFirebaseAnalytics.setUserId(user.getUid());
                     //SyncAdapter.initializeSyncAdapter(getApplicationContext());
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
                 } else {
-                    Log.d(LOG_TAG, "Signed out");
                 }
             }
         };
@@ -140,14 +144,11 @@ public class LoginActivity extends AppCompatActivity implements
             // There's immediate result available.
             handleGoogleSignInResult(pendingResult.get());
         } else {
-            // There's no immediate result ready, displays some progress indicator and waits for the
-            // async callback.
-            showProgress(true);
+            // There's no immediate result ready
             pendingResult.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(@NonNull GoogleSignInResult result) {
                     handleGoogleSignInResult(result);
-                    showProgress(false);
                 }
             });
         }
@@ -215,7 +216,6 @@ public class LoginActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             firebaseAuthWithGoogle(acct);
-            Intent intent = new Intent(this, MainActivity.class);
             if (acct != null) {
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
                 preferences.edit()
@@ -225,7 +225,6 @@ public class LoginActivity extends AppCompatActivity implements
                 mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_user_name),
                         acct.getGivenName());
             }
-            startActivity(intent);
         } else {
             // Signed out, show unauthenticated UI.
             String resultMessage = result.getStatus().getStatusMessage();
@@ -283,7 +282,7 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Toast.makeText(this, getString(R.string.error_connection_failed), Toast.LENGTH_SHORT).show();
-        Log.e(LOG_TAG, "Connection failed:  " + connectionResult.toString());
+        FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Connection failed:  " + connectionResult.toString());
         showProgress(false);
     }
 
@@ -321,21 +320,18 @@ public class LoginActivity extends AppCompatActivity implements
         showProgress(true);
 
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Create account failed:  " + task.getException());
-                            Toast.makeText(LoginActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
+            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    showProgress(false);
+                    if (!task.isSuccessful()) {
+                        Exception e = task.getException();
+                        if (e != null) {
+                            Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        showProgress(false);
                     }
-                });
+                }
+            });
     }
 
     @OnClick(R.id.email_sign_in_button)
