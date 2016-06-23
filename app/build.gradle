@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.0 rc4'
+    buildToolsVersion '24.0.0'
     defaultConfig {
         applicationId "com.jdelorenzo.hitthegym"
         minSdkVersion 15
@@ -45,5 +45,8 @@ dependencies {
     compile 'com.github.clans:fab:1.6.3'
     compile 'com.jjoe64:graphview:4.0.1'
     compile 'joda-time:joda-time:2.9.4'
-    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.facebook.android:facebook-android-sdk:4.5.0'
+    apt 'com.google.dagger:dagger-compiler:2.2'
+    compile 'com.google.dagger:dagger:2.2'
+    provided 'javax.annotation:jsr250-api:1.0'
 }

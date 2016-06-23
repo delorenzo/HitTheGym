@@ -11,8 +11,10 @@ import android.support.annotation.NonNull;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.facebook.AccessToken;
@@ -59,6 +61,8 @@ public class LoginActivity extends AppCompatActivity implements
     @BindView(R.id.login_form) View mLoginFormView;
     @BindView(R.id.google_sign_in_button) SignInButton mGoogleSignInButton;
     @BindView(R.id.facebook_login_button) LoginButton mFacebookLoginButton;
+    @BindView(R.id.email) EditText mEmailView;
+    @BindView(R.id.password) EditText mPasswordView;
     private GoogleApiClient mGoogleApiClient;
     private static final String LOG_TAG = LoginActivity.class.getSimpleName();
     private static final int RC_SIGN_IN = 100;
@@ -70,12 +74,13 @@ public class LoginActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         //log Facebook app activation events
         FacebookSdk.sdkInitialize(getApplicationContext());
         AppEventsLogger.activateApp(getApplication());
+        setContentView(R.layout.activity_login);
+        ButterKnife.bind(this);
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mAuth = FirebaseAuth.getInstance();
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
@@ -90,29 +95,8 @@ public class LoginActivity extends AppCompatActivity implements
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        //set up facebook login
-        mCallbackManager = CallbackManager.Factory.create();
-        mFacebookLoginButton.setReadPermissions("email", "public_profile");
-        mFacebookLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
 
-            @Override
-            public void onCancel() {
-
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Facebook sign in unsuccessful:  " +
-                        error.getLocalizedMessage());
-            }
-        });
-
-        mAuth = FirebaseAuth.getInstance();
-
+        //set up auth state listener
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -126,6 +110,29 @@ public class LoginActivity extends AppCompatActivity implements
                 }
             }
         };
+
+        //set up facebook login
+        mCallbackManager = CallbackManager.Factory.create();
+        mFacebookLoginButton.setReadPermissions("email", "public_profile");
+        mFacebookLoginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                showProgress(false);
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                showProgress(false);
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                showProgress(false);
+                FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Facebook sign in unsuccessful:  " +
+                        error.getLocalizedMessage());
+            }
+        });
 
         OptionalPendingResult<GoogleSignInResult> pendingResult =
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
@@ -278,6 +285,81 @@ public class LoginActivity extends AppCompatActivity implements
         Toast.makeText(this, getString(R.string.error_connection_failed), Toast.LENGTH_SHORT).show();
         Log.e(LOG_TAG, "Connection failed:  " + connectionResult.toString());
         showProgress(false);
+    }
+
+    private boolean validateForm() {
+        boolean valid = true;
+
+        String email = mEmailView.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            mEmailView.setError(getString(R.string.error_field_required));
+            valid = false;
+        } else {
+            mEmailView.setError(null);
+        }
+
+        String password = mPasswordView.getText().toString();
+        if (TextUtils.isEmpty(password)) {
+            mPasswordView.setError(getString(R.string.error_field_required));
+            valid = false;
+        } else {
+            mPasswordView.setError(null);
+        }
+
+        return valid;
+    }
+
+    @OnClick(R.id.email_register_button)
+    public void createAccount() {
+        if (!validateForm()) {
+            return;
+        }
+
+        String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        showProgress(true);
+
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Create account failed:  " + task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        showProgress(false);
+                    }
+                });
+    }
+
+    @OnClick(R.id.email_sign_in_button)
+    public void emailSignIn() {
+        if (!validateForm()) {
+            return;
+        }
+
+        String email = mEmailView.getText().toString();
+        String password = mPasswordView.getText().toString();
+
+        showProgress(true);
+        mAuth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (!task.isSuccessful()) {
+                            FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Email sign in failed:  " + task.getException());
+                            Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        showProgress(false);
+                    }
+                });
     }
 }
 

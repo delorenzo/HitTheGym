@@ -13,13 +13,14 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
+import com.google.firebase.auth.FirebaseAuth;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateRoutineDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectRoutineDialogFragment;
@@ -94,6 +95,9 @@ public class MainActivity extends AppCompatActivity implements
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+        }
+        else if (id == R.id.action_sign_out) {
+            signOut();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -235,5 +239,16 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(Long id) {
             modifyWorkout(id);
         }
+    }
+
+    private void signOut() {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        // Firebase sign out
+        auth.signOut();
+        //facebook sign out
+        LoginManager.getInstance().logOut();
+
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 }
