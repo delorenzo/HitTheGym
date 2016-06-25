@@ -36,8 +36,8 @@ public class WorkoutProvider extends ContentProvider {
     private static final String sExerciseRoutineIdDayOfWeekSelection = DayEntry.TABLE_NAME + "." +
             DayEntry.COLUMN_ROUTINE_KEY + " = ? AND " + DayEntry.TABLE_NAME + "." +
             DayEntry.COLUMN_DAY_OF_WEEK + " = ?";
-    private static final String sWeightExerciseIdSelection = WeightEntry.TABLE_NAME + "." +
-            WeightEntry.COLUMN_EXERCISE_KEY + " = ?";
+    private static final String sWeightExerciseIdSelection = ProgressEntry.TABLE_NAME + "." +
+            ProgressEntry.COLUMN_EXERCISE_KEY + " = ?";
 
     static final int ROUTINES = 100;
     static final int ROUTINE_WITH_ID = 101;
@@ -222,7 +222,7 @@ public class WorkoutProvider extends ContentProvider {
                 break;
             case WEIGHTS:
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        WeightEntry.TABLE_NAME,
+                        ProgressEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -232,9 +232,9 @@ public class WorkoutProvider extends ContentProvider {
                 );
                 break;
             case WEIGHTS_WITH_EXERCISE_ID:
-                exerciseId = WeightEntry.getExerciseIdFromUri(uri);
+                exerciseId = ProgressEntry.getExerciseIdFromUri(uri);
                 retCursor = mOpenHelper.getReadableDatabase().query(
-                        WeightEntry.TABLE_NAME,
+                        ProgressEntry.TABLE_NAME,
                         projection,
                         sWeightExerciseIdSelection,
                         new String[] { Long.toString(exerciseId)},
@@ -283,9 +283,9 @@ public class WorkoutProvider extends ContentProvider {
             case EXERCISES_WITH_ROUTINE_ID_AND_DAY_OF_WEEK:
                 return ExerciseEntry.CONTENT_TYPE;
             case WEIGHTS:
-                return WorkoutContract.WeightEntry.CONTENT_TYPE;
+                return ProgressEntry.CONTENT_TYPE;
             case WEIGHTS_WITH_EXERCISE_ID:
-                return WeightEntry.CONTENT_TYPE;
+                return ProgressEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri:  " + uri);
         }
@@ -328,9 +328,9 @@ public class WorkoutProvider extends ContentProvider {
                     throw new android.database.SQLException("Failed to insert exercise row into " + uri);
                 break;
             case WEIGHTS:
-                long weightId = db.insert(WeightEntry.TABLE_NAME, null, values);
+                long weightId = db.insert(ProgressEntry.TABLE_NAME, null, values);
                 if (weightId > 0) {
-                    returnUri = WeightEntry.buildWeightId(weightId);
+                    returnUri = ProgressEntry.buildProgressId(weightId);
                 }
                 else
                     throw new android.database.SQLException("Failed to insert weight row into " + uri);
@@ -536,7 +536,7 @@ public class WorkoutProvider extends ContentProvider {
                 returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-                        long _id = db.insert(WeightEntry.TABLE_NAME, null, value);
+                        long _id = db.insert(ProgressEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }
@@ -591,8 +591,8 @@ public class WorkoutProvider extends ContentProvider {
         matcher.addURI(authority, WorkoutContract.PATH_EXERCISE + "/" +
                 WorkoutContract.PATH_DAY_OF_WEEK + "/#", EXERCISES_WITH_DAY_OF_WEEK);
 
-        matcher.addURI(authority, WorkoutContract.PATH_WEIGHT, WEIGHTS);
-        matcher.addURI(authority, WorkoutContract.PATH_WEIGHT + "/" +
+        matcher.addURI(authority, WorkoutContract.PATH_PROGRESS, WEIGHTS);
+        matcher.addURI(authority, WorkoutContract.PATH_PROGRESS + "/" +
                 WorkoutContract.PATH_EXERCISE + "/#", WEIGHTS_WITH_EXERCISE_ID);
 
         return matcher;

@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
 
 public class WorkoutDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "workout.db";
 
@@ -43,33 +43,39 @@ public class WorkoutDbHelper extends SQLiteOpenHelper {
                 ExerciseEntry.COLUMN_REPS + " INTEGER, " +
                 ExerciseEntry.COLUMN_SETS + " INTEGER, " +
                 ExerciseEntry.COLUMN_WEIGHT + " REAL, " +
+                ExerciseEntry.COLUMN_DURATION + " INTEGER, " +
                 "FOREIGN KEY (" + ExerciseEntry.COLUMN_DAY_KEY + ") REFERENCES " +
                 DayEntry.TABLE_NAME + "(" + DayEntry._ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
                 " );";
 
-        final String SQL_CREATE_WEIGHT_TABLE = "CREATE TABLE " +
-                WeightEntry.TABLE_NAME + " ( " +
-                WeightEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                WeightEntry.COLUMN_EXERCISE_KEY + " INTEGER NOT NULL, " +
-                WeightEntry.COLUMN_WEIGHT + " REAL NOT NULL, " +
-                WeightEntry.COLUMN_DATE + " TEXT, " +
-                "FOREIGN KEY (" + WeightEntry.COLUMN_EXERCISE_KEY + ") REFERENCES " +
+        final String SQL_CREATE_PROGRESS_TABLE = "CREATE TABLE " +
+                ProgressEntry.TABLE_NAME + " ( " +
+                ProgressEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                ProgressEntry.COLUMN_EXERCISE_KEY + " INTEGER NOT NULL, " +
+                ProgressEntry.COLUMN_WEIGHT + " REAL, " +
+                ProgressEntry.COLUMN_DURATION + " INTEGER, " +
+                ProgressEntry.COLUMN_DATE + " TEXT, " +
+                "FOREIGN KEY (" + ProgressEntry.COLUMN_EXERCISE_KEY + ") REFERENCES " +
                 ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry._ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE);";
 
         db.execSQL(SQL_CREATE_ROUTINE_TABLE);
         db.execSQL(SQL_CREATE_DAY_TABLE);
         db.execSQL(SQL_CREATE_EXERCISE_TABLE);
-        db.execSQL(SQL_CREATE_WEIGHT_TABLE);
+        db.execSQL(SQL_CREATE_PROGRESS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //versions 1 and 2 are compatible
+        if (oldVersion == 1 && newVersion == 2) {
+            return;
+        }
         db.execSQL("DROP TABLE IF EXISTS " + RoutineEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + DayEntry.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + ExerciseEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + WeightEntry.TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ProgressEntry.TABLE_NAME);
         onCreate(db);
     }
 }

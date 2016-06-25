@@ -87,9 +87,13 @@
     <string name="weight_format_imperial" example="20 lb">
         <xliff:g>%1$.1f</xliff:g> lb
     </string>
+    <string name="duration_format" example="30 s">
+        <xliff:g>%1$d</xliff:g> s
+    </string>
     <string name="weight_format" example="23.45" translatable="false"><xliff:g>%1$.1f</xliff:g></string>
     <string name="weight_units_metric">kg</string>
     <string name="weight_units_imperial">lb</string>
+    <string name="duration_units">s</string>
     <string name="format_reps" example="10 reps">
         <xliff:g>%1$d</xliff:g> reps
     </string>
@@ -181,9 +185,11 @@
     <string name="sync_account_type" translatable="false">@string/app_name</string>
 
     <!-- firebase analytics strings -->
-    <string name="analytics_sign_in_key" translatable="false">sign-in</string>
+    <string name="analytics_sign_in_key" translatable="false">sign_in</string>
     <string name="analytics_sign_in_none" translatable="false">none</string>
     <string name="analytics_sign_in__google" translatable="false">google</string>
+    <string name="analytics_sign_in_facebook" translatable="false">facebook</string>
+    <string name="analytics_sign_in_email" translatable="false">email</string>
     <string name="analytics_user_name" translatable="false">name</string>
 
     <!-- firebase data strings -->

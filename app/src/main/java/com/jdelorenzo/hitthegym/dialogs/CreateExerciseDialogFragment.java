@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.firebase.crash.FirebaseCrash;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 import java.io.Serializable;
 
@@ -45,6 +46,14 @@ public class CreateExerciseDialogFragment extends DialogFragment {
     private CreateExerciseDialogFragmentListener mCallback;
 
     public static CreateExerciseDialogFragment newInstance(CreateExerciseDialogFragmentListener callback) {
+        Bundle b = new Bundle();
+        b.putSerializable(ARG_CALLBACK, callback);
+        CreateExerciseDialogFragment fragment = new CreateExerciseDialogFragment();
+        fragment.setArguments(b);
+        return fragment;
+    }
+
+    public static CreateExerciseDialogFragment newInstance(Exercise exercise, CreateExerciseDialogFragmentListener callback) {
         Bundle b = new Bundle();
         b.putSerializable(ARG_CALLBACK, callback);
         CreateExerciseDialogFragment fragment = new CreateExerciseDialogFragment();

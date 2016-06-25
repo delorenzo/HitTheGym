@@ -5,11 +5,13 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,6 +25,7 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -35,6 +38,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -59,7 +63,7 @@ import butterknife.OnClick;
  * {@see https://github.com/firebase/quickstart-android/blob/master/auth/app/src/main/java/com/google/firebase/quickstart/auth/GoogleSignInActivity.java}
  */
 public class LoginActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
     @BindView(R.id.login_progress) View mProgressView;
     @BindView(R.id.login_form) View mLoginFormView;
     @BindView(R.id.google_sign_in_button) SignInButton mGoogleSignInButton;
@@ -73,6 +77,7 @@ public class LoginActivity extends AppCompatActivity implements
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseAnalytics mFirebaseAnalytics;
     private CallbackManager mCallbackManager;
+    public static final String ACTION_LOGOUT = "com.jdelorenzo.hitthegym.service.action.LOGOUT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,9 @@ public class LoginActivity extends AppCompatActivity implements
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
+        //set look of google sign in button
+        mGoogleSignInButton.setSize(SignInButton.SIZE_WIDE);
+        mGoogleSignInButton.setScopes(gso.getScopeArray());
 
 
         //set up auth state listener
@@ -113,6 +121,13 @@ public class LoginActivity extends AppCompatActivity implements
                 }
             }
         };
+
+        Intent intent = getIntent();
+        if (intent.getAction().equals(ACTION_LOGOUT)) {
+            mGoogleApiClient.connect();
+            signOut();
+            return;
+        }
 
         //set up facebook login
         mCallbackManager = CallbackManager.Factory.create();
@@ -132,11 +147,12 @@ public class LoginActivity extends AppCompatActivity implements
             @Override
             public void onError(FacebookException error) {
                 showProgress(false);
-                FirebaseCrash.logcat(Log.WARN, LOG_TAG, "Facebook sign in unsuccessful:  " +
+                FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Facebook sign in unsuccessful:  " +
                         error.getLocalizedMessage());
             }
         });
 
+        //silent google sign in
         OptionalPendingResult<GoogleSignInResult> pendingResult =
                 Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (pendingResult.isDone()) {
@@ -151,8 +167,6 @@ public class LoginActivity extends AppCompatActivity implements
                 }
             });
         }
-        mGoogleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        mGoogleSignInButton.setScopes(gso.getScopeArray());
     }
 
     @Override
@@ -171,8 +185,6 @@ public class LoginActivity extends AppCompatActivity implements
 
     @OnClick(R.id.google_sign_in_button)
     public void signIn() {
-        mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_sign_in_key),
-                getString(R.string.analytics_sign_in__google));
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -205,6 +217,8 @@ public class LoginActivity extends AppCompatActivity implements
                             Toast.makeText(getApplicationContext(),
                                     "Facebook Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
+                        mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_sign_in_key),
+                                getString(R.string.analytics_sign_in_facebook));
                         showProgress(false);
                     }
                 });
@@ -223,6 +237,8 @@ public class LoginActivity extends AppCompatActivity implements
                         .apply();
                 mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_user_name),
                         acct.getGivenName());
+                mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_sign_in_key),
+                        getString(R.string.analytics_sign_in__google));
             }
         } else {
             // Signed out, show unauthenticated UI.
@@ -329,6 +345,8 @@ public class LoginActivity extends AppCompatActivity implements
                             Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
                     }
+                    mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_sign_in_key),
+                            getString(R.string.analytics_sign_in_email));
                 }
             });
     }
@@ -353,8 +371,53 @@ public class LoginActivity extends AppCompatActivity implements
                                     Toast.LENGTH_SHORT).show();
                         }
                         showProgress(false);
+                        mFirebaseAnalytics.setUserProperty(getString(R.string.analytics_sign_in_key),
+                                getString(R.string.analytics_sign_in_email));
                     }
                 });
+    }
+
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        //Facebook sign out
+        LoginManager.getInstance().logOut();
+
+        // Google sign out
+        if (mGoogleApiClient.isConnected()) {
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                    new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                        }
+                    });
+        }
+    }
+
+    private void revokeAccess() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google revoke access
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                    }
+                });
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        if (getIntent().getAction().equals(ACTION_LOGOUT)) {
+            signOut();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 }
 

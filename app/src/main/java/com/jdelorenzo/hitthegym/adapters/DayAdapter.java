@@ -2,8 +2,8 @@ package com.jdelorenzo.hitthegym.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +27,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayAdapterViewHo
     private View mEmptyView;
     private String[] dayStrings;
     private int mSelectedPosition = -1;
-    private int lastPosition = -1;
+    SparseBooleanArray selectedDays = new SparseBooleanArray(7);
 
     public DayAdapter(Context context, DayAdapterOnClickHandler clickHandler,
                            View emptyView) {
@@ -96,14 +96,14 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayAdapterViewHo
         int dayIndex = mCursor.getInt(EditDayFragment.COL_DAY_OF_WEEK);
         holder.dayButton.setText(dayStrings[dayIndex]);
         holder.itemView.setSelected(mSelectedPosition == position);
-        setAnimation(holder.rootView, position);
+        setAnimation(holder.rootView, dayIndex);
     }
 
     private void setAnimation(View view, int position) {
-        if (position > lastPosition) {
+        if (selectedDays.get(position, false)) {
             Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
             view.startAnimation(animation);
-            lastPosition = position;
+            selectedDays.put(position, true);
         }
     }
 
@@ -131,5 +131,9 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayAdapterViewHo
             mCursor.moveToNext();
         }
         return checked;
+    }
+
+    public SparseBooleanArray getSelectedDays() {
+        return selectedDays;
     }
 }

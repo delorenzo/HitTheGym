@@ -38,10 +38,10 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     private static final int PROGRESS_LOADER = 100;
 
     public String[] WEIGHT_COLUMNS = {
-            WorkoutContract.WeightEntry.TABLE_NAME + "." + WorkoutContract.WeightEntry._ID,
-            WorkoutContract.WeightEntry.COLUMN_WEIGHT,
-            WorkoutContract.WeightEntry.COLUMN_DATE,
-            WorkoutContract.WeightEntry.COLUMN_EXERCISE_KEY
+            WorkoutContract.ProgressEntry.TABLE_NAME + "." + WorkoutContract.ProgressEntry._ID,
+            WorkoutContract.ProgressEntry.COLUMN_WEIGHT,
+            WorkoutContract.ProgressEntry.COLUMN_DATE,
+            WorkoutContract.ProgressEntry.COLUMN_EXERCISE_KEY
     };
     public final static int COL_WEIGHT_ID = 0;
     public final static int COL_WEIGHT = 1;
@@ -98,7 +98,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Uri exerciseUri = WorkoutContract.WeightEntry.buildExerciseId(mExerciseId);
+        Uri exerciseUri = WorkoutContract.ProgressEntry.buildExerciseId(mExerciseId);
         return new CursorLoader(getActivity(),
                 exerciseUri,
                 WEIGHT_COLUMNS,

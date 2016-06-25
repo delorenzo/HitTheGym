@@ -163,7 +163,7 @@ public class DatabaseIntentService extends IntentService {
     public static void startActionRecordWeights(Context context, ArrayList<Weight> weights) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_RECORD_WEIGHTS);
-        Uri weightUri = WeightEntry.CONTENT_URI;
+        Uri weightUri = ProgressEntry.CONTENT_URI;
         intent.setData(weightUri);
         intent.putExtra(EXTRA_WEIGHTS, weights);
         context.startService(intent);
@@ -316,9 +316,9 @@ public class DatabaseIntentService extends IntentService {
                     for (int i = 0; i < weights.size(); i++) {
                         Weight w = weights.get(i);
                         ContentValues value = new ContentValues();
-                        value.put(WeightEntry.COLUMN_EXERCISE_KEY, w.getExerciseId());
-                        value.put(WeightEntry.COLUMN_WEIGHT, w.getWeight());
-                        value.put(WeightEntry.COLUMN_DATE, date);
+                        value.put(ProgressEntry.COLUMN_EXERCISE_KEY, w.getExerciseId());
+                        value.put(ProgressEntry.COLUMN_WEIGHT, w.getWeight());
+                        value.put(ProgressEntry.COLUMN_DATE, date);
                         contentValueList[i] = value;
                     }
                     getContentResolver().bulkInsert(

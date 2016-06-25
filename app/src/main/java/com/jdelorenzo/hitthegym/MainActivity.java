@@ -253,14 +253,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void signOut() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        // Firebase sign out
-        auth.signOut();
-        //facebook sign out
-        LoginManager.getInstance().logOut();
-        //TODO:  google sign out
-
         Intent intent = new Intent(this, LoginActivity.class);
+        intent.setAction(LoginActivity.ACTION_LOGOUT);
         startActivity(intent);
     }
 

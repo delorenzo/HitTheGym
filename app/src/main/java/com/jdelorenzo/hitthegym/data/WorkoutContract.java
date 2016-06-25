@@ -15,7 +15,7 @@ public class WorkoutContract {
     public static final String PATH_DAY_OF_WEEK = "dayOfWeek";
     public static final String PATH_EXERCISE = "exercise";
     public static final String PATH_NAME = "name";
-    public static final String PATH_WEIGHT = "weight";
+    public static final String PATH_PROGRESS = "progress";
 
     public static final class RoutineEntry implements BaseColumns {
 
@@ -122,6 +122,7 @@ public class WorkoutContract {
         public static final String COLUMN_SETS = "sets";
         public static final String COLUMN_WEIGHT = "weight";
         public static final String COLUMN_DESCRIPTION = "description";
+        public static final String COLUMN_DURATION = "duration";
 
         public static Uri buildExerciseId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -175,28 +176,29 @@ public class WorkoutContract {
         }
     }
 
-    public static final class WeightEntry implements BaseColumns {
+    public static final class ProgressEntry implements BaseColumns {
         public static final Uri CONTENT_URI =
-                BASE_CONTENT_URI.buildUpon().appendPath(PATH_WEIGHT).build();
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_PROGRESS).build();
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +
-                        PATH_WEIGHT;
+                        PATH_PROGRESS;
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +
-                        PATH_WEIGHT;
+                        PATH_PROGRESS;
 
         public static final String TABLE_NAME = "weight";
 
         public static final String COLUMN_WEIGHT = "weight";
+        public static final String COLUMN_DURATION = "duration";
         public static final String COLUMN_EXERCISE_KEY = "exercise_id";
         public static final String COLUMN_DATE = "date";
 
-        public static Uri buildWeightId(long id) {
+        public static Uri buildProgressId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static long getWeightIdFromUri(Uri uri) {
+        public static long getProgressIdFromUri(Uri uri) {
             String weightIdString = uri.getPathSegments().get(1);
             if (null != weightIdString && weightIdString.length() > 0)
                 return Long.parseLong(weightIdString);
