@@ -110,7 +110,6 @@ public class LoginActivity extends AppCompatActivity implements
 
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     startActivity(intent);
-                } else {
                 }
             }
         };
