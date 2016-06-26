@@ -11,6 +11,7 @@
     <dimen name="space_between_content_areas">8dp</dimen>
     <dimen name="button_bar_vertical_spacing">4dp</dimen>
     <dimen name="dialog_horizontal_padding">16dp</dimen>
+    <dimen name="dialog_text_horizontal_padding">8dp</dimen>
 
     <dimen name="edit_text_horizontal_padding">16dp</dimen>
     <dimen name="edit_text_horizontal_margin">0dp</dimen>
@@ -37,4 +38,7 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <!-- facebook button dimensions-->
     <dimen name="facebook_login_button_vertical_padding">10dp</dimen>
     <dimen name="facebook_login_button_width">322dp</dimen>
+
+    <!-- fab dimensions -->
+    <dimen name="fab_menu_vertical_margin">130dp</dimen>
 </resources>

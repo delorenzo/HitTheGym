@@ -20,6 +20,7 @@ import com.jdelorenzo.hitthegym.adapters.ExerciseAdapter;
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
 import com.jdelorenzo.hitthegym.dialogs.ModifyWeightDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.WorkoutCompleteDialogFragment;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.model.Weight;
 
 import java.util.ArrayList;
@@ -49,12 +50,13 @@ public class WorkoutFragment extends Fragment implements LoaderManager.LoaderCal
 
     public String[] EXERCISE_COLUMNS = {
             ExerciseEntry.TABLE_NAME + "." + ExerciseEntry._ID,
-            ExerciseEntry.COLUMN_WEIGHT,
+            ExerciseEntry.COLUMN_MEASUREMENT,
             ExerciseEntry.COLUMN_SETS,
             ExerciseEntry.COLUMN_REPS,
             ExerciseEntry.COLUMN_DESCRIPTION,
             DayEntry.COLUMN_LAST_DATE,
-            DayEntry.TABLE_NAME + DayEntry._ID
+            DayEntry.TABLE_NAME + DayEntry._ID,
+            ExerciseEntry.COLUMN_MEASUREMENT_TYPE
     };
     public final static int COL_EXERCISE_ID = 0;
     public final static int COL_WEIGHT = 1;
@@ -63,6 +65,7 @@ public class WorkoutFragment extends Fragment implements LoaderManager.LoaderCal
     public final static int COL_DESCRIPTION = 4;
     public static final int COL_LAST_DATE = 5;
     public static final int COL_DAY_ID = 6;
+    public static final int COL_MEASUREMENT_TYPE = 7;
 
     public WorkoutFragment() {
         // Required empty public constructor

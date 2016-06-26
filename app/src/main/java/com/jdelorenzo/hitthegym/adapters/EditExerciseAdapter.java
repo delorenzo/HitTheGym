@@ -15,6 +15,7 @@ import com.jdelorenzo.hitthegym.EditWorkoutFragment;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 import java.util.Locale;
 
@@ -39,8 +40,7 @@ public class EditExerciseAdapter extends RecyclerView.Adapter<EditExerciseAdapte
 
 
     public interface ExerciseAdapterOnClickHandler {
-        void onClick(Long id, String name, int reps, int sets, double weight,
-                     ExerciseAdapterViewHolder vh);
+        void onClick(Long id, Exercise exercise, ExerciseAdapterViewHolder vh);
         void onDelete(Long id, ExerciseAdapterViewHolder vh);
     }
 
@@ -49,7 +49,7 @@ public class EditExerciseAdapter extends RecyclerView.Adapter<EditExerciseAdapte
         @BindView(R.id.delete_exercise_button) ImageButton deleteExerciseButton;
         @BindView(R.id.exercise_name) TextView exerciseName;
         @BindView(R.id.repetitions) TextView repetitions;
-        @BindView(R.id.weight) TextView weight;
+        @BindView(R.id.measurement) TextView weight;
         @BindView(R.id.sets) TextView sets;
         @BindView(R.id.list_item_add_exercise) View rootView;
 
@@ -68,14 +68,13 @@ public class EditExerciseAdapter extends RecyclerView.Adapter<EditExerciseAdapte
             int descriptionIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION);
             int setsIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_SETS);
             int repsIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_REPS);
-            int weightIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_WEIGHT);
-            mClickHandler.onClick(
-                    mCursor.getLong(exerciseIdIndex),
-                    mCursor.getString(descriptionIndex),
-                    mCursor.getInt(repsIndex),
-                    mCursor.getInt(setsIndex),
-                    mCursor.getDouble(weightIndex),
-                    this);
+            int measurementIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT);
+            int measurementTypeIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT_TYPE);
+            @Exercise.MeasurementType int measurementType = mCursor.getInt(measurementTypeIndex);
+            Exercise exercise = new Exercise(mCursor.getInt(setsIndex), mCursor.getInt(repsIndex),
+                    mCursor.getString(descriptionIndex), mCursor.getDouble(measurementIndex),
+                    measurementType);
+            mClickHandler.onClick(mCursor.getLong(exerciseIdIndex), exercise, this);
         }
 
         @OnClick(R.id.delete_exercise_button)
@@ -112,8 +111,10 @@ public class EditExerciseAdapter extends RecyclerView.Adapter<EditExerciseAdapte
         holder.sets.setText(String.format(Locale.getDefault(),
                 mContext.getString(R.string.format_sets),
                 mCursor.getInt(EditWorkoutFragment.COL_SETS)));
-        holder.weight.setText(Utility.getFormattedWeightString(mContext,
-                mCursor.getDouble(EditWorkoutFragment.COL_WEIGHT)));
+        @Exercise.MeasurementType int measurementType = mCursor.getInt(EditWorkoutFragment.COL_MEASUREMENT_TYPE);
+        holder.weight.setText(Utility.getFormattedMeasurementString(mContext,
+                mCursor.getDouble(EditWorkoutFragment.COL_WEIGHT),
+                measurementType));
         setAnimation(holder.rootView, position);
     }
     private void setAnimation(View view, int position) {

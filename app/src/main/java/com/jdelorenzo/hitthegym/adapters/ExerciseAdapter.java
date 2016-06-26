@@ -14,10 +14,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import com.jdelorenzo.hitthegym.EditWorkoutFragment;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
 import com.jdelorenzo.hitthegym.WorkoutFragment;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.model.Weight;
 
 import org.joda.time.LocalDate;
@@ -57,7 +59,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         @BindView(R.id.complete_checkbox) CheckBox completeCheckbox;
         @BindView(R.id.exercise_name) TextView exerciseName;
         @BindView(R.id.repetitions) TextView repetitions;
-        @BindView(R.id.weight) TextView weight;
+        @BindView(R.id.measurement) TextView weight;
         @BindView(R.id.sets) TextView sets;
         private int setCount;
 
@@ -73,8 +75,8 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             int exerciseIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry._ID);
-            int weightIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_WEIGHT);
-            mClickHandler.onClick(mCursor.getLong(exerciseIndex), mCursor.getDouble(weightIndex),
+            int measurementIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT);
+            mClickHandler.onClick(mCursor.getLong(exerciseIndex), mCursor.getDouble(measurementIndex),
                     this);
         }
     }
@@ -99,8 +101,9 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                 mCursor.getInt(WorkoutFragment.COL_REPS)));
         holder.setCount = mCursor.getInt(WorkoutFragment.COL_SETS);
         holder.sets.setText(String.format(Locale.getDefault(), mContext.getString(R.string.format_sets), holder.setCount));
-        holder.weight.setText(Utility.getFormattedWeightString(mContext,
-                mCursor.getDouble(WorkoutFragment.COL_WEIGHT)));
+        @Exercise.MeasurementType int measurementType = mCursor.getInt(WorkoutFragment.COL_MEASUREMENT_TYPE);
+        holder.weight.setText(Utility.getFormattedMeasurementString(mContext,
+                mCursor.getDouble(WorkoutFragment.COL_WEIGHT), measurementType));
         if (completed) {
             holder.completeCheckbox.setChecked(true);
             holder.completeCheckbox.setClickable(false);

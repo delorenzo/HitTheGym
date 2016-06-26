@@ -38,7 +38,7 @@
         android:layout_gravity="center_vertical"
         android:maxLines="1"
         android:ellipsize="end"
-        android:id="@+id/weight"
+        android:id="@+id/measurement"
         tools:text="15.5 lb"
         android:layout_width="0dp"
         android:layout_height="wrap_content"/>

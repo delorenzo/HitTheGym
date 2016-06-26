@@ -51,8 +51,8 @@ public class WorkoutProvider extends ContentProvider {
     static final int EXERCISES_WITH_DAY_ID = 303;
     static final int EXERCISES_WITH_DAY_OF_WEEK = 304;
     static final int EXERCISES_WITH_ROUTINE_ID_AND_DAY_OF_WEEK = 305;
-    static final int WEIGHTS = 400;
-    static final int WEIGHTS_WITH_EXERCISE_ID = 401;
+    static final int PROGRESS = 400;
+    static final int PROGRESS_WITH_EXERCISE_ID = 401;
 
     private static final SQLiteQueryBuilder sDayByRoutineQueryBuilder;
 
@@ -75,6 +75,18 @@ public class WorkoutProvider extends ContentProvider {
                 DayEntry.TABLE_NAME + " INNER JOIN " + ExerciseEntry.TABLE_NAME +
                         " ON " + DayEntry.TABLE_NAME + "." + DayEntry._ID +
                         " = " + ExerciseEntry.TABLE_NAME + "." + ExerciseEntry.COLUMN_DAY_KEY
+        );
+    }
+
+    private static final SQLiteQueryBuilder sProgressQueryBuilder;
+
+    static {
+        sProgressQueryBuilder = new SQLiteQueryBuilder();
+
+        sProgressQueryBuilder.setTables(
+                ProgressEntry.TABLE_NAME + " INNER JOIN " + ExerciseEntry.TABLE_NAME +
+                        " ON " + ProgressEntry.TABLE_NAME + "." + ProgressEntry.COLUMN_EXERCISE_KEY
+                + " = " + ExerciseEntry.TABLE_NAME + "." + ExerciseEntry._ID
         );
     }
 
@@ -220,7 +232,7 @@ public class WorkoutProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case WEIGHTS:
+            case PROGRESS:
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         ProgressEntry.TABLE_NAME,
                         projection,
@@ -231,10 +243,10 @@ public class WorkoutProvider extends ContentProvider {
                         sortOrder
                 );
                 break;
-            case WEIGHTS_WITH_EXERCISE_ID:
+            case PROGRESS_WITH_EXERCISE_ID:
                 exerciseId = ProgressEntry.getExerciseIdFromUri(uri);
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ProgressEntry.TABLE_NAME,
+                retCursor = sProgressQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
                         projection,
                         sWeightExerciseIdSelection,
                         new String[] { Long.toString(exerciseId)},
@@ -282,9 +294,9 @@ public class WorkoutProvider extends ContentProvider {
                 return ExerciseEntry.CONTENT_TYPE;
             case EXERCISES_WITH_ROUTINE_ID_AND_DAY_OF_WEEK:
                 return ExerciseEntry.CONTENT_TYPE;
-            case WEIGHTS:
+            case PROGRESS:
                 return ProgressEntry.CONTENT_TYPE;
-            case WEIGHTS_WITH_EXERCISE_ID:
+            case PROGRESS_WITH_EXERCISE_ID:
                 return ProgressEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri:  " + uri);
@@ -327,7 +339,7 @@ public class WorkoutProvider extends ContentProvider {
                 else
                     throw new android.database.SQLException("Failed to insert exercise row into " + uri);
                 break;
-            case WEIGHTS:
+            case PROGRESS:
                 long weightId = db.insert(ProgressEntry.TABLE_NAME, null, values);
                 if (weightId > 0) {
                     returnUri = ProgressEntry.buildProgressId(weightId);
@@ -531,7 +543,7 @@ public class WorkoutProvider extends ContentProvider {
                     db.endTransaction();
                 }
                 break;
-            case WEIGHTS:
+            case PROGRESS:
                 db.beginTransaction();
                 returnCount = 0;
                 try {
@@ -591,9 +603,9 @@ public class WorkoutProvider extends ContentProvider {
         matcher.addURI(authority, WorkoutContract.PATH_EXERCISE + "/" +
                 WorkoutContract.PATH_DAY_OF_WEEK + "/#", EXERCISES_WITH_DAY_OF_WEEK);
 
-        matcher.addURI(authority, WorkoutContract.PATH_PROGRESS, WEIGHTS);
+        matcher.addURI(authority, WorkoutContract.PATH_PROGRESS, PROGRESS);
         matcher.addURI(authority, WorkoutContract.PATH_PROGRESS + "/" +
-                WorkoutContract.PATH_EXERCISE + "/#", WEIGHTS_WITH_EXERCISE_ID);
+                WorkoutContract.PATH_EXERCISE + "/#", PROGRESS_WITH_EXERCISE_ID);
 
         return matcher;
     }

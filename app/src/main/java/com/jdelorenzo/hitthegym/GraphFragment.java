@@ -16,12 +16,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import org.joda.time.LocalDate;
+
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,16 +40,18 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
     private Cursor mCursor;
     private static final int PROGRESS_LOADER = 100;
 
-    public String[] WEIGHT_COLUMNS = {
+    public String[] PROGRESS_COLUMNS = {
             WorkoutContract.ProgressEntry.TABLE_NAME + "." + WorkoutContract.ProgressEntry._ID,
-            WorkoutContract.ProgressEntry.COLUMN_WEIGHT,
+            WorkoutContract.ProgressEntry.TABLE_NAME + "." + WorkoutContract.ProgressEntry.COLUMN_MEASUREMENT,
             WorkoutContract.ProgressEntry.COLUMN_DATE,
-            WorkoutContract.ProgressEntry.COLUMN_EXERCISE_KEY
+            WorkoutContract.ProgressEntry.COLUMN_EXERCISE_KEY,
+            WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT_TYPE
     };
-    public final static int COL_WEIGHT_ID = 0;
-    public final static int COL_WEIGHT = 1;
+    public final static int COL_PROGRESS_ID = 0;
+    public final static int COL_MEASUREMENT = 1;
     public final static int COL_DATE = 2;
     public final static int COL_EXERCISE_KEY = 3;
+    public final static int COL_MEASUREMENT_TYPE = 4;
 
     public static GraphFragment newInstance(long itemId) {
         Bundle arguments = new Bundle();
@@ -101,7 +106,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
         Uri exerciseUri = WorkoutContract.ProgressEntry.buildExerciseId(mExerciseId);
         return new CursorLoader(getActivity(),
                 exerciseUri,
-                WEIGHT_COLUMNS,
+                PROGRESS_COLUMNS,
                 null,
                 null,
                 null);
@@ -131,7 +136,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             if (mCursor.getCount() > 1) {
                 points = new DataPoint[mCursor.getCount()];
                 for (int i = 0; i < points.length && !mCursor.isAfterLast(); i++) {
-                    Double weight = mCursor.getDouble(COL_WEIGHT);
+                    Double weight = mCursor.getDouble(COL_MEASUREMENT);
                     String dateString = mCursor.getString(COL_DATE);
                     LocalDate date = new LocalDate(dateString);
                     //this hacky way of storing the date is a consequence of the
@@ -146,7 +151,7 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
             //to display something
             else {
                 points = new DataPoint[2];
-                Double weight = mCursor.getDouble(COL_WEIGHT);
+                Double weight = mCursor.getDouble(COL_MEASUREMENT);
                 String dateString = mCursor.getString(COL_DATE);
                 LocalDate date = new LocalDate(dateString);
                 //this hacky way of storing the date is a consequence of the
@@ -176,7 +181,10 @@ public class GraphFragment extends Fragment implements LoaderManager.LoaderCallb
                         return dateString.substring(0, 1) + "/" + dateString.substring(1, 2);
                     }
                     else {
-                        return Utility.getFormattedWeightString(getContext(), value);
+                        @Exercise.MeasurementType int measurementType =
+                                mCursor.getInt(COL_MEASUREMENT_TYPE);
+                        return Utility.getFormattedMeasurementString(getContext(), value,
+                                measurementType);
                     }
                 }
             });

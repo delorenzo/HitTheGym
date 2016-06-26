@@ -10,6 +10,7 @@ import android.util.Log;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.model.Weight;
 
 import org.joda.time.LocalDate;
@@ -32,7 +33,7 @@ public class DatabaseIntentService extends IntentService {
     private static final String ACTION_ADD_EXERCISE = "com.jdelorenzo.hitthegym.service.action.ADD_EXERCISE";
     private static final String ACTION_EDIT_EXERCISE = "com.jdelorenzo.hitthegym.service.action.EDIT_EXERCISE";
     private static final String ACTION_DELETE_EXERCISE = "com.jdelorenzo.hitthegym.service.action.DELETE_EXERCISE";
-    private static final String ACTION_EDIT_EXERCISE_WEIGHT = "com.jdelorenzo.capstone.service.action_EDIT_EXERCISE_WEIGHT";
+    private static final String ACTION_EDIT_EXERCISE_MEASUREMENT = "com.jdelorenzo.capstone.service.action_EDIT_EXERCISE_WEIGHT";
     private static final String ACTION_COMPLETE_WORKOUT = "com.jdelorenzo.capstone.service.action_COMPLETE_WORKOUT";
     private static final String ACTION_RECORD_WEIGHTS = "com.jdelorenzo.capstone.service.action_RECORD_WEIGHTS";
 
@@ -42,9 +43,10 @@ public class DatabaseIntentService extends IntentService {
     private static final String EXTRA_NAME = "com.jdelorenzo.hitthegym.service.extra.NAME";
     private static final String EXTRA_REPS = "com.jdelorenzo.hitthegym.service.extra.REPS";
     private static final String EXTRA_SETS = "com.jdelorenzo.hitthegym.service.extra.SETS";
-    private static final String EXTRA_WEIGHT = "com.jdelorenzo.hitthegym.service.extra.WEIGHT";
+    private static final String EXTRA_MEASUREMENT = "com.jdelorenzo.hitthegym.service.extra.WEIGHT";
     private static final String EXTRA_DATE = "com.jdelorenzo.hitthegym.service.extra.DATE";
     private static final String EXTRA_WEIGHTS = "com.jdelorenzo.hitthegym.service.extra.WEIGHTS";
+    private static final String EXTRA_EXERCISE = "com.jdelorenzo.hitthegym.service.extra.EXERCISE";
 
     private static final String LOG_TAG = DatabaseIntentService.class.getSimpleName();
 
@@ -102,16 +104,12 @@ public class DatabaseIntentService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startActionAddExercise(Context context, long dayId, String name, int sets,
-                                              int reps, double weight) {
+    public static void startActionAddExercise(Context context, long dayId, Exercise exercise) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_ADD_EXERCISE);
         intent.setData(ExerciseEntry.CONTENT_URI);
         intent.putExtra(EXTRA_DAY_ID, dayId);
-        intent.putExtra(EXTRA_NAME, name);
-        intent.putExtra(EXTRA_SETS, sets);
-        intent.putExtra(EXTRA_REPS, reps);
-        intent.putExtra(EXTRA_WEIGHT, weight);
+        intent.putExtra(EXTRA_EXERCISE, exercise);
         context.startService(intent);
     }
 
@@ -122,23 +120,19 @@ public class DatabaseIntentService extends IntentService {
         context.startService(intent);
     }
 
-    public static void startActionEditExercise(Context context, long id, String name, int sets,
-                                              int reps, double weight) {
+    public static void startActionEditExercise(Context context, long id, Exercise exercise) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_EDIT_EXERCISE);
         intent.setData(ExerciseEntry.buildExerciseId(id));
-        intent.putExtra(EXTRA_NAME, name);
-        intent.putExtra(EXTRA_SETS, sets);
-        intent.putExtra(EXTRA_REPS, reps);
-        intent.putExtra(EXTRA_WEIGHT, weight);
+        intent.putExtra(EXTRA_EXERCISE, exercise);
         context.startService(intent);
     }
 
     public static void startActionEditExerciseWeight(Context context, long id, double weight) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
-        intent.setAction(ACTION_EDIT_EXERCISE_WEIGHT);
+        intent.setAction(ACTION_EDIT_EXERCISE_MEASUREMENT);
         intent.setData(ExerciseEntry.buildExerciseId(id));
-        intent.putExtra(EXTRA_WEIGHT, weight);
+        intent.putExtra(EXTRA_MEASUREMENT, weight);
         context.startService(intent);
     }
 
@@ -244,14 +238,17 @@ public class DatabaseIntentService extends IntentService {
                     contentValues = new ContentValues();
                     contentValues.put(ExerciseEntry.COLUMN_DAY_KEY,
                             intent.getLongExtra(EXTRA_DAY_ID, 0));
+                    Exercise exercise = intent.getParcelableExtra(EXTRA_EXERCISE);
                     contentValues.put(ExerciseEntry.COLUMN_DESCRIPTION,
-                            intent.getStringExtra(EXTRA_NAME));
+                            exercise.getDescription());
                     contentValues.put(ExerciseEntry.COLUMN_REPS,
-                            intent.getIntExtra(EXTRA_REPS, 0));
+                            exercise.getReps());
                     contentValues.put(ExerciseEntry.COLUMN_SETS,
-                            intent.getIntExtra(EXTRA_SETS, 0));
-                    contentValues.put(ExerciseEntry.COLUMN_WEIGHT,
-                            intent.getDoubleExtra(EXTRA_WEIGHT, 0));
+                            exercise.getSets());
+                    contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT,
+                            exercise.getMeasurement());
+                    contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT_TYPE,
+                            exercise.getMeasurementType());
                     getContentResolver().insert(
                             intent.getData(),
                             contentValues
@@ -260,14 +257,17 @@ public class DatabaseIntentService extends IntentService {
 
                 case ACTION_EDIT_EXERCISE:
                     contentValues = new ContentValues();
+                    exercise = intent.getParcelableExtra(EXTRA_EXERCISE);
                     contentValues.put(ExerciseEntry.COLUMN_DESCRIPTION,
-                            intent.getStringExtra(EXTRA_NAME));
+                            exercise.getDescription());
                     contentValues.put(ExerciseEntry.COLUMN_REPS,
-                            intent.getIntExtra(EXTRA_REPS, 0));
+                            exercise.getReps());
                     contentValues.put(ExerciseEntry.COLUMN_SETS,
-                            intent.getIntExtra(EXTRA_SETS, 0));
-                    contentValues.put(ExerciseEntry.COLUMN_WEIGHT,
-                            intent.getDoubleExtra(EXTRA_WEIGHT, 0));
+                            exercise.getSets());
+                    contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT,
+                            exercise.getMeasurement());
+                    contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT_TYPE,
+                            exercise.getMeasurementType());
                     getContentResolver().update(
                             intent.getData(),
                             contentValues,
@@ -276,10 +276,10 @@ public class DatabaseIntentService extends IntentService {
                     );
                     break;
 
-                case ACTION_EDIT_EXERCISE_WEIGHT:
+                case ACTION_EDIT_EXERCISE_MEASUREMENT:
                     contentValues = new ContentValues();
-                    contentValues.put(ExerciseEntry.COLUMN_WEIGHT,
-                            intent.getDoubleExtra(EXTRA_WEIGHT, 0));
+                    contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT,
+                            intent.getDoubleExtra(EXTRA_MEASUREMENT, 0));
                     getContentResolver().update(
                             intent.getData(),
                             contentValues,
@@ -317,7 +317,7 @@ public class DatabaseIntentService extends IntentService {
                         Weight w = weights.get(i);
                         ContentValues value = new ContentValues();
                         value.put(ProgressEntry.COLUMN_EXERCISE_KEY, w.getExerciseId());
-                        value.put(ProgressEntry.COLUMN_WEIGHT, w.getWeight());
+                        value.put(ProgressEntry.COLUMN_MEASUREMENT, w.getWeight());
                         value.put(ProgressEntry.COLUMN_DATE, date);
                         contentValueList[i] = value;
                     }

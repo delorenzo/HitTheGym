@@ -6,9 +6,11 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.AppCompatSpinner;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,16 +33,20 @@ implemented in the calling activity.
  */
 public class CreateExerciseDialogFragment extends DialogFragment {
     private static final String ARG_CALLBACK = "callback";
+    private static final String ARG_EXERCISE = "exercise";
     @BindView(R.id.exercise) EditText exerciseEditText;
     @BindView(R.id.sets) EditText setsEditText;
     @BindView(R.id.repetitions) EditText repetitionsEditText;
-    @BindView(R.id.weight) EditText weightEditText;
-    @BindView(R.id.weight_units) TextView weightUnits;
+    @BindView(R.id.measurement) EditText measurementEditText;
+    @BindView(R.id.measurement_units) TextView measurementUnits;
+    @BindView(R.id.measurement_selector) AppCompatSpinner measurementSelector;
+    private @Exercise.MeasurementType int measurementType;
     private static final String LOG_TAG = CreateExerciseDialogFragment.class.getSimpleName();
+    private Exercise mExercise;
 
     private Unbinder unbinder;
     public interface CreateExerciseDialogFragmentListener extends Serializable {
-        void onCreateExercise(int sets, int reps, String description, double weight);
+        void onCreateExercise(Exercise exercise);
     }
 
     private CreateExerciseDialogFragmentListener mCallback;
@@ -56,6 +62,7 @@ public class CreateExerciseDialogFragment extends DialogFragment {
     public static CreateExerciseDialogFragment newInstance(Exercise exercise, CreateExerciseDialogFragmentListener callback) {
         Bundle b = new Bundle();
         b.putSerializable(ARG_CALLBACK, callback);
+        b.putParcelable(ARG_EXERCISE, exercise);
         CreateExerciseDialogFragment fragment = new CreateExerciseDialogFragment();
         fragment.setArguments(b);
         return fragment;
@@ -63,14 +70,45 @@ public class CreateExerciseDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        if (getArguments() != null) {
-            mCallback = (CreateExerciseDialogFragmentListener) getArguments().getSerializable(ARG_CALLBACK);
+        Bundle args = getArguments();
+        if (args != null) {
+            mCallback = (CreateExerciseDialogFragmentListener) args.getSerializable(ARG_CALLBACK);
+            mExercise = args.getParcelable(ARG_EXERCISE);
         }
+
+        //fill in the exercise if it was chosen from an existing exercise
+        if (mExercise != null) {
+            exerciseEditText.setText(mExercise.getDescription());
+            setsEditText.setText(mExercise.getSets());
+            repetitionsEditText.setText(mExercise.getReps());
+            measurementEditText.setText(Utility.getFormattedWeightStringWithoutUnits(getActivity(),
+                    mExercise.getMeasurement()));
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View rootView = inflater.inflate(R.layout.dialog_add_exercise, null);
         unbinder = ButterKnife.bind(this, rootView);
-        weightUnits.setText(Utility.getWeightUnits(getActivity()));
+        measurementUnits.setText(Utility.getWeightUnits(getActivity()));
+        measurementSelector.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String selection = (String) adapterView.getItemAtPosition(i);
+                if (selection.equals(getString(R.string.measurement_duration))) {
+                    measurementUnits.setText(getString(R.string.duration_units));
+                    measurementType = Exercise.MEASUREMENT_TYPE_DURATION;
+                }
+                else {
+                    measurementUnits.setText(Utility.getWeightUnits(getActivity()));
+                    measurementType = Exercise.MEASUREMENT_TYPE_WEIGHT;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
         builder.setTitle(R.string.dialog_create_exercise_title)
                 .setIcon(R.drawable.ic_run_color_primary_24dp)
                 .setMessage(R.string.dialog_create_exercise_text)
@@ -142,20 +180,30 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                         return;
                     }
                     int repetitions = Integer.parseInt(repetitionText);
-                    String weightText = weightEditText.getText().toString();
-                    if (weightText.isEmpty()) {
+                    String measurementText = measurementEditText.getText().toString();
+                    double measurement;
+                    if (measurementText.isEmpty()) {
                         FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty weight entered");
-                        weightEditText.setError(getString(R.string.error_message_weight_required));
+                        measurementEditText.setError(getString(R.string.error_message_field_required));
                         return;
                     }
-                    else if (!weightText.matches(getString(R.string.regex_valid_decimal))) {
+                    if (!measurementText.matches(getString(R.string.regex_valid_decimal))) {
                         FirebaseCrash.logcat(Log.INFO, LOG_TAG,
-                                "Invalid weight " + weightText + " entered.");
-                        weightEditText.setError(getString(R.string.error_message_invalid_weight));
+                                "Invalid measurement " + measurementText + " entered.");
+                        measurementEditText.setError(getString(R.string.error_message_invalid_measurement));
                         return;
                     }
-                    double weight =  Double.parseDouble(weightText);
-                    mCallback.onCreateExercise(sets, repetitions, description, weight);
+                    measurement =  Double.parseDouble(measurementText);
+                    //always store weight in metric
+                    measurement = Utility.convertWeightToMetric(getActivity(), measurement);
+                    Exercise exercise = new Exercise(
+                            sets,
+                            repetitions,
+                            description,
+                            measurement,
+                            measurementType
+                    );
+                    mCallback.onCreateExercise(exercise);
                     dismiss();
                 }
             });

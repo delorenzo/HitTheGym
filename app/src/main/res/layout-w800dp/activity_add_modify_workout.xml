@@ -64,12 +64,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
+        android:paddingTop="@dimen/fab_menu_vertical_margin"
         android:src="@drawable/ic_add_white_24dp"
+        app:layout_anchor="@id/app_bar"
+        app:layout_anchorGravity="bottom|end"
+        app:layout_collapseMode="pin"
+        app:menu_openDirection="down"
         app:menu_colorNormal="?colorAccent"
         app:menu_colorRipple="@android:color/white"
-        app:layout_anchor="@id/app_bar"
-        app:menu_colorPressed="@color/colorAccentDark"
-        app:layout_anchorGravity="bottom|end" >
+        app:menu_colorPressed="@color/colorAccentDark">
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_day"
@@ -87,7 +90,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_run_color_accent_24dp"
-            app:fab_label="@string/action_add_exercise" />
+            app:fab_label="@string/action_create_new_exercise" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_existing_exercise"
+            app:fab_colorNormal="@android:color/white"
+            app:fab_colorPressed="@color/colorAccent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_run_color_primary_24dp"
+            app:fab_label="@string/action_add_existing_exercise" />
 
     </com.github.clans.fab.FloatingActionMenu>
 

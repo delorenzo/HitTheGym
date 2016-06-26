@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -155,6 +156,7 @@ public class ViewStatsActivity extends AppCompatActivity
                 return getString(R.string.empty_progress_text);
             }
             mCursor.moveToPosition(position);
+            String name = mCursor.getString(COL_NAME);
             return mCursor.getString(COL_NAME);
         }
 
@@ -184,6 +186,7 @@ public class ViewStatsActivity extends AppCompatActivity
         if (mCursor != null && mCursor.moveToFirst()) {
             mCursor.moveToPosition(currentPosition);
             mPager.setCurrentItem(currentPosition, false);
+            Log.e("TAG", mCursor.getString(COL_NAME));
             emptyView.setVisibility(View.GONE);
         }
         else {

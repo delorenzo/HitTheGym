@@ -5,9 +5,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 public class WorkoutDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     static final String DATABASE_NAME = "workout.db";
 
@@ -42,8 +43,8 @@ public class WorkoutDbHelper extends SQLiteOpenHelper {
                 ExerciseEntry.COLUMN_DESCRIPTION + " TEXT NOT NULL, " +
                 ExerciseEntry.COLUMN_REPS + " INTEGER, " +
                 ExerciseEntry.COLUMN_SETS + " INTEGER, " +
-                ExerciseEntry.COLUMN_WEIGHT + " REAL, " +
-                ExerciseEntry.COLUMN_DURATION + " INTEGER, " +
+                ExerciseEntry.COLUMN_MEASUREMENT + " REAL, " +
+                ExerciseEntry.COLUMN_MEASUREMENT_TYPE + " INTEGER, " +
                 "FOREIGN KEY (" + ExerciseEntry.COLUMN_DAY_KEY + ") REFERENCES " +
                 DayEntry.TABLE_NAME + "(" + DayEntry._ID + ") " +
                 "ON DELETE CASCADE ON UPDATE CASCADE " +
@@ -53,8 +54,7 @@ public class WorkoutDbHelper extends SQLiteOpenHelper {
                 ProgressEntry.TABLE_NAME + " ( " +
                 ProgressEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 ProgressEntry.COLUMN_EXERCISE_KEY + " INTEGER NOT NULL, " +
-                ProgressEntry.COLUMN_WEIGHT + " REAL, " +
-                ProgressEntry.COLUMN_DURATION + " INTEGER, " +
+                ProgressEntry.COLUMN_MEASUREMENT + " REAL, " +
                 ProgressEntry.COLUMN_DATE + " TEXT, " +
                 "FOREIGN KEY (" + ProgressEntry.COLUMN_EXERCISE_KEY + ") REFERENCES " +
                 ExerciseEntry.TABLE_NAME + "(" + ExerciseEntry._ID + ") " +
@@ -68,14 +68,23 @@ public class WorkoutDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        //versions 1 and 2 are compatible
-        if (oldVersion == 1 && newVersion == 2) {
-            return;
+        int upgradeTo = oldVersion + 1;
+        while (upgradeTo <= newVersion) {
+            switch (upgradeTo) {
+                case 2:
+                    //From version 1 to 2, the weight table was renamed to progress,
+                    //and the column weight was renamed to measurement.  Also, an additional column
+                    //measurement_type was added to the exercise table.
+                    db.execSQL("ALTER TABLE exercise RENAME to exercise_orig");
+                    db.execSQL("CREATE TABLE exercise AS SELECT _id, day_id, repetitions, sets, description, weight AS measurement FROM exercise_orig");
+                    db.execSQL("ALTER TABLE exercise ADD COLUMN measurement_type INTEGER DEFAULT " + Exercise.MEASUREMENT_TYPE_WEIGHT);
+                    db.execSQL("CREATE TABLE progress AS SELECT _id, exercise_id, date, weight AS measurement FROM weight");
+                    db.execSQL("DROP TABLE IF EXISTS exercise_orig");
+                    db.execSQL("DROP TABLE IF EXISTS weight");
+            }
+            upgradeTo++;
         }
-        db.execSQL("DROP TABLE IF EXISTS " + RoutineEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + DayEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ExerciseEntry.TABLE_NAME);
-        db.execSQL("DROP TABLE IF EXISTS " + ProgressEntry.TABLE_NAME);
-        onCreate(db);
     }
+
+
 }

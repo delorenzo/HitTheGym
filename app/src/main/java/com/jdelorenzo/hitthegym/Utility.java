@@ -4,9 +4,33 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.jdelorenzo.hitthegym.model.Exercise;
+
 import java.util.Locale;
 
 public class Utility {
+
+    public static String getFormattedMeasurementString(Context context, double measurement,
+                                                       @Exercise.MeasurementType int measurementType) {
+        if (measurementType == Exercise.MEASUREMENT_TYPE_WEIGHT) {
+            return getFormattedWeightString(context, measurement);
+        }
+        else {
+            return String.format(Locale.getDefault(), context.getString(R.string.duration_format),
+                    measurement);
+        }
+    }
+
+    public static String getFormattedMeasurementStringWithoutUnits(Context context, double measurement,
+                                                       @Exercise.MeasurementType int measurementType) {
+        if (measurementType == Exercise.MEASUREMENT_TYPE_WEIGHT) {
+            return getFormattedWeightStringWithoutUnits(context, measurement);
+        }
+        else {
+            return String.valueOf(measurement);
+        }
+    }
+
     public static String getFormattedWeightString(Context context, double weight) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String unit = preferences.getString(context.getString(R.string.prefs_weight_unit_key),

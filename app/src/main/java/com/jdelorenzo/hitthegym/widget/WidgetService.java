@@ -12,6 +12,7 @@ import android.widget.RemoteViewsService;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -24,16 +25,18 @@ public class WidgetService extends RemoteViewsService {
 
     public static final String[] EXERCISE_COLUMNS = {
             WorkoutContract.ExerciseEntry.TABLE_NAME + "." + WorkoutContract.ExerciseEntry._ID,
-            WorkoutContract.ExerciseEntry.COLUMN_WEIGHT,
+            WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT,
             WorkoutContract.ExerciseEntry.COLUMN_SETS,
             WorkoutContract.ExerciseEntry.COLUMN_REPS,
-            WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION
+            WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION,
+            WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT_TYPE
     };
     public final static int COL_EXERCISE_ID = 0;
-    public final static int COL_WEIGHT = 1;
+    public final static int COL_MEASUREMENT = 1;
     public final static int COL_SETS = 2;
     public final static int COL_REPS = 3;
     public final static int COL_DESCRIPTION = 4;
+    public final static int COL_MEASUREMENT_TYPE = 5;
 
     @Override
     public RemoteViewsService.RemoteViewsFactory onGetViewFactory(Intent intent) {
@@ -91,11 +94,12 @@ public class WidgetService extends RemoteViewsService {
                 String name = data.getString(COL_DESCRIPTION);
                 int reps = data.getInt(COL_REPS);
                 int sets = data.getInt(COL_SETS);
-                double weight = data.getDouble(COL_WEIGHT);
+                double measurement = data.getDouble(COL_MEASUREMENT);
+                @Exercise.MeasurementType int measurementType = data.getInt(COL_MEASUREMENT_TYPE);
                 String setsRepsString = String.format(Locale.getDefault(),
                         getString(R.string.reps_sets_format), reps, sets);
-                String weightString = Utility.getFormattedWeightString(getApplicationContext(),
-                        weight);
+                String weightString = Utility.getFormattedMeasurementString(getApplicationContext(),
+                        measurement, measurementType);
                 views.setTextViewText(R.id.widget_exercise_name, name);
                 views.setTextViewText(R.id.widget_reps_sets, setsRepsString);
                 views.setTextViewText(R.id.widget_weight, weightString);

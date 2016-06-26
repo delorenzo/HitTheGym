@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateExerciseDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectDaysDialogFragment;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.service.DatabaseIntentService;
 
 import java.util.ArrayList;
@@ -120,6 +121,11 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         dialogFragment.show(getFragmentManager(), FTAG_SELECT_DAYS);
     }
 
+    @Optional @OnClick(R.id.fab_existing_exercise)
+    public void onExistingExerciseFab() {
+
+    }
+
     //in multi pane mode, this is one of the FAB menu options
     @Optional @OnClick(R.id.fab_exercise)
     public void onExerciseFab() {
@@ -133,10 +139,8 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         CreateExerciseDialogFragment dialogFragment = CreateExerciseDialogFragment
                 .newInstance(new CreateExerciseDialogFragment.CreateExerciseDialogFragmentListener() {
             @Override
-            public void onCreateExercise(int sets, int reps, String description, double weight) {
-                //always store weight in metric
-                weight = Utility.convertWeightToMetric(getApplicationContext(), weight);
-                DatabaseIntentService.startActionAddExercise(getApplicationContext(), dayId, description, sets, reps, weight);
+            public void onCreateExercise(Exercise exercise) {
+                DatabaseIntentService.startActionAddExercise(getApplicationContext(), dayId, exercise);
                 getContentResolver().notifyChange(WorkoutContract.ExerciseEntry.buildDayId(dayId), null);
             }
         });

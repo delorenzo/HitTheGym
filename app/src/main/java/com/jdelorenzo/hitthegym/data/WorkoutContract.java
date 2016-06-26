@@ -120,9 +120,9 @@ public class WorkoutContract {
         public static final String COLUMN_DAY_KEY = "day_id";
         public static final String COLUMN_REPS = "repetitions";
         public static final String COLUMN_SETS = "sets";
-        public static final String COLUMN_WEIGHT = "weight";
+        public static final String COLUMN_MEASUREMENT = "measurement";
         public static final String COLUMN_DESCRIPTION = "description";
-        public static final String COLUMN_DURATION = "duration";
+        public static final String COLUMN_MEASUREMENT_TYPE = "measurement_type";
 
         public static Uri buildExerciseId(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
@@ -187,10 +187,9 @@ public class WorkoutContract {
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" +
                         PATH_PROGRESS;
 
-        public static final String TABLE_NAME = "weight";
+        public static final String TABLE_NAME = "progress";
 
-        public static final String COLUMN_WEIGHT = "weight";
-        public static final String COLUMN_DURATION = "duration";
+        public static final String COLUMN_MEASUREMENT = "measurement";
         public static final String COLUMN_EXERCISE_KEY = "exercise_id";
         public static final String COLUMN_DATE = "date";
 

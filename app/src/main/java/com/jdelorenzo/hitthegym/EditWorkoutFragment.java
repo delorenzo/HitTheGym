@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.jdelorenzo.hitthegym.adapters.EditExerciseAdapter;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.EditExerciseDialogFragment;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.service.DatabaseIntentService;
 
 import butterknife.BindView;
@@ -40,16 +41,18 @@ public class EditWorkoutFragment extends Fragment implements LoaderManager.Loade
 
     public String[] EXERCISE_COLUMNS = {
             WorkoutContract.ExerciseEntry.TABLE_NAME + "." + WorkoutContract.ExerciseEntry._ID,
-            WorkoutContract.ExerciseEntry.COLUMN_WEIGHT,
+            WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT,
             WorkoutContract.ExerciseEntry.COLUMN_SETS,
             WorkoutContract.ExerciseEntry.COLUMN_REPS,
-            WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION
+            WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION,
+            WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT_TYPE
     };
     public final static int COL_EXERCISE_ID = 0;
     public final static int COL_WEIGHT = 1;
     public final static int COL_SETS = 2;
     public final static int COL_REPS = 3;
     public final static int COL_DESCRIPTION = 4;
+    public final static int COL_MEASUREMENT_TYPE = 5;
 
     public static EditWorkoutFragment newInstance(long workoutId, long dayId) {
         EditWorkoutFragment fragment = new EditWorkoutFragment();
@@ -93,19 +96,17 @@ public class EditWorkoutFragment extends Fragment implements LoaderManager.Loade
         unbinder = ButterKnife.bind(this, rootView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setHasFixedSize(true);
-        //mRecyclerView.setItemAnimator(new SlideAnimator());
         mAdapter = new EditExerciseAdapter(getActivity(), new EditExerciseAdapter.ExerciseAdapterOnClickHandler() {
             @Override
-            public void onClick(final Long id, String name, int reps, int sets, double weight,
+            public void onClick(final Long id, Exercise exercise,
                                 EditExerciseAdapter.ExerciseAdapterViewHolder vh) {
                 EditExerciseDialogFragment fragment = EditExerciseDialogFragment.newInstance(
-                        name, reps, sets, weight,
+                        exercise,
                         new EditExerciseDialogFragment.EditExerciseDialogFragmentListener() {
                             @Override
-                            public void onEditExercise(int reps, int sets, String description, double weight) {
-                                weight = Utility.convertWeightToMetric(getActivity(), weight);
+                            public void onEditExercise(Exercise exercise) {
                                 DatabaseIntentService.startActionEditExercise(getActivity(),
-                                        id, description, sets, reps, weight);
+                                        id, exercise);
                                 getActivity().getContentResolver().notifyChange(
                                         WorkoutContract.ExerciseEntry.buildDayId(mDayId), null);
                             }

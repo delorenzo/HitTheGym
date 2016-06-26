@@ -19,4 +19,9 @@
         <item name="friday">@string/friday</item>
         <item name="saturday">@string/saturday</item>
     </string-array>
+
+    <string-array name="measurement">
+        <item name="weight">@string/measurement_weight</item>
+        <item name="duration">@string/measurement_duration</item>
+    </string-array>
 </resources>
