@@ -71,6 +71,8 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayAdapterViewHo
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             int dayId = mCursor.getColumnIndex(WorkoutContract.DayEntry._ID);
+            int dayIndex = mCursor.getInt(EditDayFragment.COL_DAY_OF_WEEK);
+            selectedDays.put(dayIndex, false);
             notifyItemRemoved(adapterPosition);
             mClickHandler.onDelete(mCursor.getLong(dayId), this);
         }
@@ -100,7 +102,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayAdapterViewHo
     }
 
     private void setAnimation(View view, int position) {
-        if (selectedDays.get(position, false)) {
+        if (!selectedDays.get(position, false)) {
             Animation animation = AnimationUtils.loadAnimation(mContext, android.R.anim.slide_in_left);
             view.startAnimation(animation);
             selectedDays.put(position, true);

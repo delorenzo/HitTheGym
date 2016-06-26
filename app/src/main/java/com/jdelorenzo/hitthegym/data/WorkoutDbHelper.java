@@ -8,7 +8,7 @@ import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
 import com.jdelorenzo.hitthegym.model.Exercise;
 
 public class WorkoutDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 2;
 
     static final String DATABASE_NAME = "workout.db";
 

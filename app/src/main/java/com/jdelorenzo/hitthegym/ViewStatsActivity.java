@@ -186,7 +186,6 @@ public class ViewStatsActivity extends AppCompatActivity
         if (mCursor != null && mCursor.moveToFirst()) {
             mCursor.moveToPosition(currentPosition);
             mPager.setCurrentItem(currentPosition, false);
-            Log.e("TAG", mCursor.getString(COL_NAME));
             emptyView.setVisibility(View.GONE);
         }
         else {
