@@ -121,11 +121,6 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         dialogFragment.show(getFragmentManager(), FTAG_SELECT_DAYS);
     }
 
-    @Optional @OnClick(R.id.fab_existing_exercise)
-    public void onExistingExerciseFab() {
-
-    }
-
     //in multi pane mode, this is one of the FAB menu options
     @Optional @OnClick(R.id.fab_exercise)
     public void onExerciseFab() {
