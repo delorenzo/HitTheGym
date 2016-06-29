@@ -55,11 +55,11 @@ public class WorkoutFragment extends Fragment implements LoaderManager.LoaderCal
             ExerciseEntry.COLUMN_REPS,
             ExerciseEntry.COLUMN_DESCRIPTION,
             DayEntry.COLUMN_LAST_DATE,
-            DayEntry.TABLE_NAME + DayEntry._ID,
+            DayEntry.TABLE_NAME + "." + DayEntry._ID,
             ExerciseEntry.COLUMN_MEASUREMENT_TYPE
     };
     public final static int COL_EXERCISE_ID = 0;
-    public final static int COL_WEIGHT = 1;
+    public final static int COL_MEASUREMENT = 1;
     public final static int COL_SETS = 2;
     public final static int COL_REPS = 3;
     public final static int COL_DESCRIPTION = 4;

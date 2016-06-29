@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 public class WorkoutProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -30,14 +31,18 @@ public class WorkoutProvider extends ContentProvider {
             DayEntry.COLUMN_DAY_OF_WEEK + " = ?";
     private static final String sDayRoutineKeySelection = DayEntry.TABLE_NAME + "." +
             DayEntry.COLUMN_ROUTINE_KEY + " = ?";
-    private static final String sExerciseDayIdSelection = ExerciseEntry.TABLE_NAME + "." +
-            ExerciseEntry.COLUMN_DAY_KEY + " = ?";
+    private static final String sExerciseDayIdSelection = ExerciseDayLinkerEntry.TABLE_NAME + "." +
+            ExerciseDayLinkerEntry.COLUMN_DAY_KEY + " = ?";
     private static final String sExerciseDayOfWeekSelection = DayEntry.COLUMN_DAY_OF_WEEK + " = ?";
     private static final String sExerciseRoutineIdDayOfWeekSelection = DayEntry.TABLE_NAME + "." +
             DayEntry.COLUMN_ROUTINE_KEY + " = ? AND " + DayEntry.TABLE_NAME + "." +
             DayEntry.COLUMN_DAY_OF_WEEK + " = ?";
     private static final String sWeightExerciseIdSelection = ProgressEntry.TABLE_NAME + "." +
             ProgressEntry.COLUMN_EXERCISE_KEY + " = ?";
+    private static final String sLinkByExerciseAndDaySelection = ExerciseDayLinkerEntry.TABLE_NAME
+            + "." + ExerciseDayLinkerEntry.COLUMN_DAY_KEY + " = ? AND " +
+            ExerciseDayLinkerEntry.TABLE_NAME + "." + ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY +
+            " = ?";
 
     static final int ROUTINES = 100;
     static final int ROUTINE_WITH_ID = 101;
@@ -53,6 +58,7 @@ public class WorkoutProvider extends ContentProvider {
     static final int EXERCISES_WITH_ROUTINE_ID_AND_DAY_OF_WEEK = 305;
     static final int PROGRESS = 400;
     static final int PROGRESS_WITH_EXERCISE_ID = 401;
+    static final int DAY_EXERCISE_LINK = 500;
 
     private static final SQLiteQueryBuilder sDayByRoutineQueryBuilder;
 
@@ -72,9 +78,14 @@ public class WorkoutProvider extends ContentProvider {
         sExerciseByDayQueryBuilder = new SQLiteQueryBuilder();
 
         sExerciseByDayQueryBuilder.setTables(
-                DayEntry.TABLE_NAME + " INNER JOIN " + ExerciseEntry.TABLE_NAME +
+                DayEntry.TABLE_NAME + " INNER JOIN " + ExerciseDayLinkerEntry.TABLE_NAME +
                         " ON " + DayEntry.TABLE_NAME + "." + DayEntry._ID +
-                        " = " + ExerciseEntry.TABLE_NAME + "." + ExerciseEntry.COLUMN_DAY_KEY
+                        " = " + ExerciseDayLinkerEntry.TABLE_NAME + "." +
+                        ExerciseDayLinkerEntry.COLUMN_DAY_KEY
+                        + " INNER JOIN " + ExerciseEntry.TABLE_NAME + " ON " +
+                        ExerciseEntry.TABLE_NAME + "." + ExerciseEntry._ID +
+                        " = " + ExerciseDayLinkerEntry.TABLE_NAME + "." +
+                        ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY
         );
     }
 
@@ -197,8 +208,8 @@ public class WorkoutProvider extends ContentProvider {
                 break;
             case EXERCISES_WITH_DAY_ID:
                 dayId = ExerciseEntry.getDayIdFromUri(uri);
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ExerciseEntry.TABLE_NAME,
+                retCursor = sExerciseByDayQueryBuilder.query(
+                        mOpenHelper.getReadableDatabase(),
                         projection,
                         sExerciseDayIdSelection,
                         new String[] {Long.toString(dayId)},
@@ -345,7 +356,15 @@ public class WorkoutProvider extends ContentProvider {
                     returnUri = ProgressEntry.buildProgressId(weightId);
                 }
                 else
-                    throw new android.database.SQLException("Failed to insert weight row into " + uri);
+                    throw new android.database.SQLException("Failed to insert progress row into " + uri);
+                break;
+            case DAY_EXERCISE_LINK:
+                long id = db.insert(ExerciseDayLinkerEntry.TABLE_NAME, null, values);
+                if (id > 0) {
+                    returnUri = ExerciseDayLinkerEntry.buildId(id);
+                }
+                else
+                    throw new android.database.SQLException("Failed to insert link row into " + uri);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri in inset:  " + uri);
@@ -402,6 +421,13 @@ public class WorkoutProvider extends ContentProvider {
                 rowsDeleted = db.delete(ExerciseEntry.TABLE_NAME,
                         sExerciseIdSelection,
                         new String[] {Long.toString(exerciseId)});
+                break;
+            case DAY_EXERCISE_LINK:
+                dayId = ExerciseDayLinkerEntry.getDayIdFromUri(uri);
+                exerciseId = ExerciseDayLinkerEntry.getExerciseIdFromUri(uri);
+                rowsDeleted = db.delete(ExerciseDayLinkerEntry.TABLE_NAME,
+                        sLinkByExerciseAndDaySelection,
+                        new String[] {Long.toString(dayId), Long.toString(exerciseId)});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri in delete:  " + uri);
@@ -606,6 +632,8 @@ public class WorkoutProvider extends ContentProvider {
         matcher.addURI(authority, WorkoutContract.PATH_PROGRESS, PROGRESS);
         matcher.addURI(authority, WorkoutContract.PATH_PROGRESS + "/" +
                 WorkoutContract.PATH_EXERCISE + "/#", PROGRESS_WITH_EXERCISE_ID);
+
+        matcher.addURI(authority, WorkoutContract.PATH_LINKER, DAY_EXERCISE_LINK);
 
         return matcher;
     }

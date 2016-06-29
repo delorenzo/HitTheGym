@@ -3,6 +3,7 @@ package com.jdelorenzo.hitthegym;
 import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -56,6 +57,7 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         mTwoPane = findViewById(R.id.fragment_detail_container) != null;
         if (savedInstanceState == null) {
             EditDayFragment selectDayFragment = EditDayFragment.newInstance(mRoutineId, null);
+            ActivityCompat.postponeEnterTransition(this);
             getFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_master_container, selectDayFragment, FTAG_EDIT_DAY)
@@ -75,6 +77,7 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
                         .replace(R.id.fragment_detail_container, editWorkoutFragment,
                                 FTAG_EDIT_WORKOUT)
                         .commit();
+                ActivityCompat.postponeEnterTransition(this);
                 EditDayFragment selectDayFragment = EditDayFragment.newInstance(mRoutineId, null);
                 getFragmentManager()
                         .beginTransaction()

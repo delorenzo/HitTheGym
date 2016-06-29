@@ -16,6 +16,7 @@ public class WorkoutContract {
     public static final String PATH_EXERCISE = "exercise";
     public static final String PATH_NAME = "name";
     public static final String PATH_PROGRESS = "progress";
+    public static final String PATH_LINKER = "day_exercise_linker";
 
     public static final class RoutineEntry implements BaseColumns {
 
@@ -117,7 +118,6 @@ public class WorkoutContract {
 
         public static final String TABLE_NAME = "exercise";
 
-        public static final String COLUMN_DAY_KEY = "day_id";
         public static final String COLUMN_REPS = "repetitions";
         public static final String COLUMN_SETS = "sets";
         public static final String COLUMN_MEASUREMENT = "measurement";
@@ -214,6 +214,48 @@ public class WorkoutContract {
             String weightIdString = uri.getPathSegments().get(2);
             if (null != weightIdString && weightIdString.length() > 0)
                 return Long.parseLong(weightIdString);
+            else
+                return 0;
+        }
+    }
+
+    public static final class ExerciseDayLinkerEntry implements BaseColumns {
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_LINKER).build();
+
+        public static final String TABLE_NAME = "exercise_day_linker";
+        public static final String COLUMN_DAY_KEY = "day_key";
+        public static final String COLUMN_EXERCISE_KEY = "exercise_key";
+
+        public static Uri buildId(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildDayIdExerciseId(long dayId, long exerciseId) {
+            return CONTENT_URI.buildUpon().appendPath(PATH_DAY).appendPath(Long.toString(dayId))
+                    .appendPath(PATH_EXERCISE).appendPath(Long.toString(exerciseId)).build();
+        }
+
+        public static long getIdFromUri(Uri uri) {
+            String idString = uri.getPathSegments().get(1);
+            if (null != idString && idString.length() > 0)
+                return Long.parseLong(idString);
+            else
+                return 0;
+        }
+
+        public static long getExerciseIdFromUri(Uri uri) {
+            String exerciseIdString = uri.getPathSegments().get(4);
+            if (null != exerciseIdString && exerciseIdString.length() > 0)
+                return Long.parseLong(exerciseIdString);
+            else
+                return 0;
+        }
+
+        public static long getDayIdFromUri(Uri uri) {
+            String dayIdString = uri.getPathSegments().get(2);
+            if (null != dayIdString && dayIdString.length() > 0)
+                return Long.parseLong(dayIdString);
             else
                 return 0;
         }

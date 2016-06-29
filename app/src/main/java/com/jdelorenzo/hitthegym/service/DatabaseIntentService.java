@@ -36,6 +36,7 @@ public class DatabaseIntentService extends IntentService {
     private static final String ACTION_EDIT_EXERCISE_MEASUREMENT = "com.jdelorenzo.capstone.service.action_EDIT_EXERCISE_WEIGHT";
     private static final String ACTION_COMPLETE_WORKOUT = "com.jdelorenzo.capstone.service.action_COMPLETE_WORKOUT";
     private static final String ACTION_RECORD_WEIGHTS = "com.jdelorenzo.capstone.service.action_RECORD_WEIGHTS";
+    private static final String ACTION_DELETE_EXERCISE_FROM_DAY = "com.jdelorenzo.capstone.service.action_DELETE_EXERCISE_FROM_DAY";
 
     private static final String EXTRA_DAY_ID = "com.jdelorenzo.hitthegym.service.extra.DAY_ID";
     private static final String EXTRA_DAY_OF_WEEK = "com.jdelorenzo.hitthegym.service.extra.DAY_OF_WEEK";
@@ -117,6 +118,13 @@ public class DatabaseIntentService extends IntentService {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_DELETE_EXERCISE);
         intent.setData(ExerciseEntry.buildExerciseId(id));
+        context.startService(intent);
+    }
+
+    public static void startActionDeleteExerciseFromDay(Context context, long exerciseId, long dayId) {
+        Intent intent = new Intent(context, DatabaseIntentService.class);
+        intent.setAction(ACTION_DELETE_EXERCISE_FROM_DAY);
+        intent.setData(ExerciseDayLinkerEntry.buildDayIdExerciseId(exerciseId, dayId));
         context.startService(intent);
     }
 
@@ -236,8 +244,6 @@ public class DatabaseIntentService extends IntentService {
 
                 case ACTION_ADD_EXERCISE:
                     contentValues = new ContentValues();
-                    contentValues.put(ExerciseEntry.COLUMN_DAY_KEY,
-                            intent.getLongExtra(EXTRA_DAY_ID, 0));
                     Exercise exercise = intent.getParcelableExtra(EXTRA_EXERCISE);
                     contentValues.put(ExerciseEntry.COLUMN_DESCRIPTION,
                             exercise.getDescription());
@@ -249,9 +255,18 @@ public class DatabaseIntentService extends IntentService {
                             exercise.getMeasurement());
                     contentValues.put(ExerciseEntry.COLUMN_MEASUREMENT_TYPE,
                             exercise.getMeasurementType());
-                    getContentResolver().insert(
+                    Uri uri = getContentResolver().insert(
                             intent.getData(),
                             contentValues
+                    );
+
+                    ContentValues linkerValues = new ContentValues();
+                    long exerciseId = ExerciseEntry.getExerciseIdFromUri(uri);
+                    linkerValues.put(ExerciseDayLinkerEntry.COLUMN_DAY_KEY, intent.getLongExtra(EXTRA_DAY_ID, 0));
+                    linkerValues.put(ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY, exerciseId);
+                    getContentResolver().insert(
+                            ExerciseDayLinkerEntry.CONTENT_URI,
+                            linkerValues
                     );
                     break;
 
@@ -289,6 +304,14 @@ public class DatabaseIntentService extends IntentService {
                     break;
 
                 case ACTION_DELETE_EXERCISE:
+                    getContentResolver().delete(
+                            intent.getData(),
+                            null,
+                            null
+                    );
+                    break;
+
+                case ACTION_DELETE_EXERCISE_FROM_DAY:
                     getContentResolver().delete(
                             intent.getData(),
                             null,

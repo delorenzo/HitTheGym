@@ -116,7 +116,7 @@ public class EditWorkoutFragment extends Fragment implements LoaderManager.Loade
 
             @Override
             public void onDelete(Long id, EditExerciseAdapter.ExerciseAdapterViewHolder vh) {
-                DatabaseIntentService.startActionDeleteExercise(getActivity(), id);
+                DatabaseIntentService.startActionDeleteExerciseFromDay(getActivity(), id, mDayId);
                 getActivity().getContentResolver().notifyChange(WorkoutContract.ExerciseEntry.buildDayId(mDayId), null);
             }
         }, mEmptyView, ListView.CHOICE_MODE_SINGLE);

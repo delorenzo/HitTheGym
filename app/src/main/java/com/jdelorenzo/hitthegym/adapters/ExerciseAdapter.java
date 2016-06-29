@@ -14,7 +14,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import com.jdelorenzo.hitthegym.EditWorkoutFragment;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
 import com.jdelorenzo.hitthegym.WorkoutFragment;
@@ -103,7 +102,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
         holder.sets.setText(String.format(Locale.getDefault(), mContext.getString(R.string.format_sets), holder.setCount));
         @Exercise.MeasurementType int measurementType = mCursor.getInt(WorkoutFragment.COL_MEASUREMENT_TYPE);
         holder.weight.setText(Utility.getFormattedMeasurementString(mContext,
-                mCursor.getDouble(WorkoutFragment.COL_WEIGHT), measurementType));
+                mCursor.getDouble(WorkoutFragment.COL_MEASUREMENT), measurementType));
         if (completed) {
             holder.completeCheckbox.setChecked(true);
             holder.completeCheckbox.setClickable(false);
@@ -199,7 +198,7 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             while (!mCursor.isAfterLast()) {
                 weights.add(new Weight(
                         mCursor.getLong(WorkoutFragment.COL_EXERCISE_ID),
-                        mCursor.getDouble(WorkoutFragment.COL_WEIGHT)
+                        mCursor.getDouble(WorkoutFragment.COL_MEASUREMENT)
                 ));
                 mCursor.moveToNext();
             }
