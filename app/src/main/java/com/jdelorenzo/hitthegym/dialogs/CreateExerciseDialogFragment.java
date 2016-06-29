@@ -47,6 +47,7 @@ public class CreateExerciseDialogFragment extends DialogFragment {
     private Unbinder unbinder;
     public interface CreateExerciseDialogFragmentListener extends Serializable {
         void onCreateExercise(Exercise exercise);
+        void onSelectExisting();
     }
 
     private CreateExerciseDialogFragmentListener mCallback;
@@ -85,7 +86,7 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                     mExercise.getMeasurement()));
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_AlertDialog);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View rootView = inflater.inflate(R.layout.dialog_add_exercise, null);
         unbinder = ButterKnife.bind(this, rootView);
@@ -113,6 +114,13 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                 .setIcon(R.drawable.ic_run_color_primary_24dp)
                 .setMessage(R.string.dialog_create_exercise_text)
                 .setView(rootView)
+                .setNeutralButton("Use existing exercise instead", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mCallback.onSelectExisting();
+                        dismiss();
+                    }
+                })
                 .setPositiveButton(R.string.action_accept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -195,7 +203,9 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                     }
                     measurement =  Double.parseDouble(measurementText);
                     //always store weight in metric
-                    measurement = Utility.convertWeightToMetric(getActivity(), measurement);
+                    if (measurementType == Exercise.MEASUREMENT_TYPE_WEIGHT) {
+                        measurement = Utility.convertWeightToMetric(getActivity(), measurement);
+                    }
                     Exercise exercise = new Exercise(
                             sets,
                             repetitions,

@@ -20,17 +20,9 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.facebook.login.LoginManager;
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.crash.FirebaseCrash;
-import com.google.firebase.database.Logger;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateRoutineDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectRoutineDialogFragment;

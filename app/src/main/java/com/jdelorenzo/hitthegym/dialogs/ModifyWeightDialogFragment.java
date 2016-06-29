@@ -12,6 +12,7 @@ import android.widget.NumberPicker;
 
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
+import com.jdelorenzo.hitthegym.model.Exercise;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -24,18 +25,22 @@ public class ModifyWeightDialogFragment extends DialogFragment {
     private int currentWeight;
     private int currentWeightFraction;
     private long exerciseId;
+    private @Exercise.MeasurementType int measurementType;
     private ModifyWeightListener mListener;
     private static final String ARG_ID = "id";
     private static final String ARG_WEIGHT = "weight";
+    private static final String ARG_MEASUREMENT_TYPE = "measurementType";
 
     public interface ModifyWeightListener {
-        void onWeightModified(long id, double weight);
+        void onWeightModified(long id, double weight, @Exercise.MeasurementType int measurementType);
     }
 
-    public static ModifyWeightDialogFragment newInstance(long id, double weight) {
+    public static ModifyWeightDialogFragment newInstance(long id, double weight,
+                                                         @Exercise.MeasurementType int measurementType) {
         Bundle b = new Bundle();
         b.putLong(ARG_ID, id);
         b.putDouble(ARG_WEIGHT, weight);
+        b.putInt(ARG_MEASUREMENT_TYPE, measurementType);
         ModifyWeightDialogFragment fragment = new ModifyWeightDialogFragment();
         fragment.setArguments(b);
         return fragment;
@@ -55,6 +60,7 @@ public class ModifyWeightDialogFragment extends DialogFragment {
     }
 
     @Override
+    @SuppressWarnings("ResourceType")
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
@@ -66,6 +72,7 @@ public class ModifyWeightDialogFragment extends DialogFragment {
                 currentWeight = Integer.parseInt(weightParts[0]);
                 currentWeightFraction = Integer.parseInt(weightParts[1]);
             }
+            measurementType = args.getInt(ARG_MEASUREMENT_TYPE);
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
@@ -89,7 +96,8 @@ public class ModifyWeightDialogFragment extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String weightString = currentWeight + "." + currentWeightFraction;
-                        mListener.onWeightModified(exerciseId, Double.parseDouble(weightString));
+                        mListener.onWeightModified(exerciseId, Double.parseDouble(weightString),
+                                measurementType);
                     }
                 })
                 .setNegativeButton(R.string.action_cancel, new DialogInterface.OnClickListener() {

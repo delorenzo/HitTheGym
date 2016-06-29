@@ -13,7 +13,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
-import com.jdelorenzo.hitthegym.model.Exercise;
 
 public class WorkoutProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -39,7 +38,7 @@ public class WorkoutProvider extends ContentProvider {
             DayEntry.COLUMN_DAY_OF_WEEK + " = ?";
     private static final String sWeightExerciseIdSelection = ProgressEntry.TABLE_NAME + "." +
             ProgressEntry.COLUMN_EXERCISE_KEY + " = ?";
-    private static final String sLinkByExerciseAndDaySelection = ExerciseDayLinkerEntry.TABLE_NAME
+    private static final String sLinkByDayAndExerciseSelection = ExerciseDayLinkerEntry.TABLE_NAME
             + "." + ExerciseDayLinkerEntry.COLUMN_DAY_KEY + " = ? AND " +
             ExerciseDayLinkerEntry.TABLE_NAME + "." + ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY +
             " = ?";
@@ -59,6 +58,7 @@ public class WorkoutProvider extends ContentProvider {
     static final int PROGRESS = 400;
     static final int PROGRESS_WITH_EXERCISE_ID = 401;
     static final int DAY_EXERCISE_LINK = 500;
+    static final int DAY_EXERCISE_LINK_WITH_DAY_AND_EXERCISE = 501;
 
     private static final SQLiteQueryBuilder sDayByRoutineQueryBuilder;
 
@@ -422,11 +422,11 @@ public class WorkoutProvider extends ContentProvider {
                         sExerciseIdSelection,
                         new String[] {Long.toString(exerciseId)});
                 break;
-            case DAY_EXERCISE_LINK:
+            case DAY_EXERCISE_LINK_WITH_DAY_AND_EXERCISE:
                 dayId = ExerciseDayLinkerEntry.getDayIdFromUri(uri);
                 exerciseId = ExerciseDayLinkerEntry.getExerciseIdFromUri(uri);
                 rowsDeleted = db.delete(ExerciseDayLinkerEntry.TABLE_NAME,
-                        sLinkByExerciseAndDaySelection,
+                        sLinkByDayAndExerciseSelection,
                         new String[] {Long.toString(dayId), Long.toString(exerciseId)});
                 break;
             default:
@@ -634,6 +634,9 @@ public class WorkoutProvider extends ContentProvider {
                 WorkoutContract.PATH_EXERCISE + "/#", PROGRESS_WITH_EXERCISE_ID);
 
         matcher.addURI(authority, WorkoutContract.PATH_LINKER, DAY_EXERCISE_LINK);
+        matcher.addURI(authority, WorkoutContract.PATH_LINKER + "/" + WorkoutContract.PATH_DAY +
+                "/#/" + WorkoutContract.PATH_EXERCISE + "/#",
+                DAY_EXERCISE_LINK_WITH_DAY_AND_EXERCISE);
 
         return matcher;
     }

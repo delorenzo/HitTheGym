@@ -100,8 +100,8 @@ public class WorkoutFragment extends Fragment implements LoaderManager.LoaderCal
         mRecyclerView.setHasFixedSize(true);
         mExerciseAdapter = new ExerciseAdapter(getActivity(), new ExerciseAdapter.ExerciseAdapterOnClickHandler() {
             @Override
-            public void onClick(long id, double weight, ExerciseAdapter.ExerciseAdapterViewHolder vh) {
-                ModifyWeightDialogFragment fragment = ModifyWeightDialogFragment.newInstance(id, weight);
+            public void onClick(long id, double weight, @Exercise.MeasurementType int measurementType, ExerciseAdapter.ExerciseAdapterViewHolder vh) {
+                ModifyWeightDialogFragment fragment = ModifyWeightDialogFragment.newInstance(id, weight, measurementType);
                 fragment.show(getFragmentManager(), FTAG_MODIFY_WEIGHT);
             }
 

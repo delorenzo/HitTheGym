@@ -166,7 +166,7 @@ public class EditExerciseDialogFragment extends DialogFragment {
                     int repetitions = Integer.parseInt(repetitionText);
                     String measurementText = measurementEditText.getText().toString();
                     @Exercise.MeasurementType int measurementType = measurementSelector.getSelectedItemPosition();
-                    double measurement = 0.0;
+                    double measurement ;
                     if (measurementText.isEmpty()) {
                         FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty measurement entered");
                         measurementEditText.setError(getString(R.string.error_field_required));
@@ -180,7 +180,9 @@ public class EditExerciseDialogFragment extends DialogFragment {
                     }
                     measurement =  Double.parseDouble(measurementText);
                     //always store weight in metric
-                    measurement = Utility.convertWeightToMetric(getActivity(), measurement);
+                    if (measurementType == Exercise.MEASUREMENT_TYPE_WEIGHT) {
+                        measurement = Utility.convertWeightToMetric(getActivity(), measurement);
+                    }
                     Exercise exercise = new Exercise(
                             sets,
                             repetitions,

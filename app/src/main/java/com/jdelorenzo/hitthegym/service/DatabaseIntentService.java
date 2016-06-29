@@ -37,6 +37,7 @@ public class DatabaseIntentService extends IntentService {
     private static final String ACTION_COMPLETE_WORKOUT = "com.jdelorenzo.capstone.service.action_COMPLETE_WORKOUT";
     private static final String ACTION_RECORD_WEIGHTS = "com.jdelorenzo.capstone.service.action_RECORD_WEIGHTS";
     private static final String ACTION_DELETE_EXERCISE_FROM_DAY = "com.jdelorenzo.capstone.service.action_DELETE_EXERCISE_FROM_DAY";
+    private static final String ACTION_ADD_EXISTING_EXERCISE = "com.jdelorenzo.capstone.service.action_ADD_EXISTING_EXERCISE";
 
     private static final String EXTRA_DAY_ID = "com.jdelorenzo.hitthegym.service.extra.DAY_ID";
     private static final String EXTRA_DAY_OF_WEEK = "com.jdelorenzo.hitthegym.service.extra.DAY_OF_WEEK";
@@ -114,6 +115,13 @@ public class DatabaseIntentService extends IntentService {
         context.startService(intent);
     }
 
+    public static void startActionAddExistingExercise(Context context, long dayId, long exerciseId) {
+        Intent intent = new Intent(context, DatabaseIntentService.class);
+        intent.setAction(ACTION_ADD_EXISTING_EXERCISE);
+        intent.setData(ExerciseDayLinkerEntry.buildDayIdExerciseId(dayId, exerciseId));
+        context.startService(intent);
+    }
+
     public static void startActionDeleteExercise(Context context, long id) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_DELETE_EXERCISE);
@@ -124,7 +132,7 @@ public class DatabaseIntentService extends IntentService {
     public static void startActionDeleteExerciseFromDay(Context context, long exerciseId, long dayId) {
         Intent intent = new Intent(context, DatabaseIntentService.class);
         intent.setAction(ACTION_DELETE_EXERCISE_FROM_DAY);
-        intent.setData(ExerciseDayLinkerEntry.buildDayIdExerciseId(exerciseId, dayId));
+        intent.setData(ExerciseDayLinkerEntry.buildDayIdExerciseId(dayId, exerciseId));
         context.startService(intent);
     }
 
@@ -263,6 +271,19 @@ public class DatabaseIntentService extends IntentService {
                     ContentValues linkerValues = new ContentValues();
                     long exerciseId = ExerciseEntry.getExerciseIdFromUri(uri);
                     linkerValues.put(ExerciseDayLinkerEntry.COLUMN_DAY_KEY, intent.getLongExtra(EXTRA_DAY_ID, 0));
+                    linkerValues.put(ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY, exerciseId);
+                    getContentResolver().insert(
+                            ExerciseDayLinkerEntry.CONTENT_URI,
+                            linkerValues
+                    );
+                    break;
+
+                case ACTION_ADD_EXISTING_EXERCISE:
+                    uri = intent.getData();
+                    linkerValues = new ContentValues();
+                    exerciseId = ExerciseDayLinkerEntry.getExerciseIdFromUri(uri);
+                    long dayId = ExerciseDayLinkerEntry.getDayIdFromUri(uri);
+                    linkerValues.put(ExerciseDayLinkerEntry.COLUMN_DAY_KEY, dayId);
                     linkerValues.put(ExerciseDayLinkerEntry.COLUMN_EXERCISE_KEY, exerciseId);
                     getContentResolver().insert(
                             ExerciseDayLinkerEntry.CONTENT_URI,

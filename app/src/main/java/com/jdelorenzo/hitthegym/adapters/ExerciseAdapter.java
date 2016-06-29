@@ -48,7 +48,8 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     }
 
     public interface ExerciseAdapterOnClickHandler {
-        void onClick(long id, double weight, ExerciseAdapterViewHolder vh);
+        void onClick(long id, double weight, @Exercise.MeasurementType int measurementType,
+                     ExerciseAdapterViewHolder vh);
         void allItemsChecked();
     }
 
@@ -75,7 +76,11 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
             mCursor.moveToPosition(adapterPosition);
             int exerciseIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry._ID);
             int measurementIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT);
-            mClickHandler.onClick(mCursor.getLong(exerciseIndex), mCursor.getDouble(measurementIndex),
+            int measurementTypeIndex = mCursor.getColumnIndex(WorkoutContract.ExerciseEntry.COLUMN_MEASUREMENT_TYPE);
+            @Exercise.MeasurementType int measurementType = mCursor.getInt(measurementIndex);
+            mClickHandler.onClick(mCursor.getLong(exerciseIndex),
+                    mCursor.getDouble(measurementIndex),
+                    measurementType,
                     this);
         }
     }

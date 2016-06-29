@@ -2,6 +2,8 @@ package com.jdelorenzo.hitthegym;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateExerciseDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectDaysDialogFragment;
+import com.jdelorenzo.hitthegym.dialogs.SelectExerciseDialogFragment;
 import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.service.DatabaseIntentService;
 
@@ -30,6 +33,8 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
     private long mRoutineId;
     private boolean [] mCheckedDays;
     private boolean mTwoPane;
+    String[] mExercises = new String[]{};
+    long[] mExerciseIds = new long[]{};
 
     private static final String EXTRA_CHECKED_DAYS = "checkedDays";
     private static final String EXTRA_WORKOUT_ID = "workoutId";
@@ -41,6 +46,7 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
     private static final String FTAG_EDIT_WORKOUT = "editWorkoutFragment";
     private static final String FTAG_SELECT_DAYS = "selectDaysDialogFragment";
     private static final String FTAG_ADD_EXERCISE = "addExerciseDialogFragment";
+    private static final String FTAG_SELECT_EXERCISES = "selectExercisesDialogFragment";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,7 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        new RetrieveWorkoutsTask().execute();
         Bundle b = getIntent().getExtras();
         if (b!= null) {
             mRoutineName = b.getString(ARG_WORKOUT_NAME);
@@ -141,6 +148,18 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
                 DatabaseIntentService.startActionAddExercise(getApplicationContext(), dayId, exercise);
                 getContentResolver().notifyChange(WorkoutContract.ExerciseEntry.buildDayId(dayId), null);
             }
+
+            @Override
+            public void onSelectExisting() {
+                SelectExerciseDialogFragment dialogFragment = SelectExerciseDialogFragment.newInstance(new SelectExerciseDialogFragment.SelectExerciseListener() {
+                    @Override
+                    public void onExerciseSelected(long exerciseId) {
+                        DatabaseIntentService.startActionAddExistingExercise(getApplicationContext(), dayId, exerciseId);
+                        getContentResolver().notifyChange(WorkoutContract.ExerciseEntry.buildDayId(dayId), null);
+                    }
+                }, mExercises, mExerciseIds);
+                dialogFragment.show(getFragmentManager(), FTAG_SELECT_EXERCISES);
+            }
         });
         dialogFragment.show(getFragmentManager(), FTAG_ADD_EXERCISE);
     }
@@ -184,5 +203,37 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private class RetrieveWorkoutsTask extends AsyncTask<Void, Void, long[]> {
+        public String EXERCISE_COLUMNS[] = {
+                WorkoutContract.ExerciseEntry.TABLE_NAME + "." + WorkoutContract.RoutineEntry._ID,
+                WorkoutContract.ExerciseEntry.COLUMN_DESCRIPTION
+        };
+        public int COL_ID = 0;
+        public int COL_NAME = 1;
+
+        @Override
+        protected long [] doInBackground(Void... params) {
+            Cursor retCursor = getContentResolver().query(
+                    WorkoutContract.ExerciseEntry.CONTENT_URI,
+                    EXERCISE_COLUMNS,
+                    null,
+                    null,
+                    null
+            );
+            if (retCursor != null && retCursor.moveToFirst()) {
+                int count = retCursor.getCount();
+                mExerciseIds = new long[count];
+                mExercises = new String[count];
+                for (int i = 0; i < count; i++) {
+                    mExerciseIds[i] = retCursor.getLong(COL_ID);
+                    mExercises[i] = retCursor.getString(COL_NAME);
+                    retCursor.moveToNext();
+                }
+                retCursor.close();
+            }
+            return mExerciseIds;
+        }
     }
 }

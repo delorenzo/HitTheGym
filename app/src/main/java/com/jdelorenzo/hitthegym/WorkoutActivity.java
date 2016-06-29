@@ -13,6 +13,7 @@ import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.ModifyWeightDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.RestDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.WorkoutCompleteDialogFragment;
+import com.jdelorenzo.hitthegym.model.Exercise;
 import com.jdelorenzo.hitthegym.model.Weight;
 import com.jdelorenzo.hitthegym.service.DatabaseIntentService;
 
@@ -85,8 +86,10 @@ public class WorkoutActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onWeightModified(long id, double weight) {
-        weight = Utility.convertWeightToMetric(getApplicationContext(), weight);
+    public void onWeightModified(long id, double weight, @Exercise.MeasurementType int measurementType) {
+        if (measurementType == Exercise.MEASUREMENT_TYPE_WEIGHT) {
+            weight = Utility.convertWeightToMetric(getApplicationContext(), weight);
+        }
         DatabaseIntentService.startActionEditExerciseWeight(this, id, weight);
         Calendar calendar = Calendar.getInstance();
         //the days are indexed by 0, calendar is indexed by 1

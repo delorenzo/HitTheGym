@@ -1,11 +1,11 @@
 package com.jdelorenzo.hitthegym.dialogs;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 
 import com.jdelorenzo.hitthegym.R;
 
@@ -43,7 +43,7 @@ public class SelectDaysDialogFragment extends DialogFragment {
                 }
             }
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.AppTheme_AlertDialog);
         builder.setTitle(R.string.dialog_select_days_title)
                 .setMultiChoiceItems(R.array.days, mCheckedItems, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
