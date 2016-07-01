@@ -141,8 +141,9 @@ public class ModifyRoutineActivity extends AppCompatActivity implements
             return;
         }
         final long dayId = fragment.getDayId();
+        boolean exercisesExist = (mExercises != null && mExercises.length > 0);
         CreateExerciseDialogFragment dialogFragment = CreateExerciseDialogFragment
-                .newInstance(new CreateExerciseDialogFragment.CreateExerciseDialogFragmentListener() {
+                .newInstance(exercisesExist, new CreateExerciseDialogFragment.CreateExerciseDialogFragmentListener() {
             @Override
             public void onCreateExercise(Exercise exercise) {
                 DatabaseIntentService.startActionAddExercise(getApplicationContext(), dayId, exercise);

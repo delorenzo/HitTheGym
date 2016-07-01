@@ -34,6 +34,7 @@ implemented in the calling activity.
 public class CreateExerciseDialogFragment extends DialogFragment {
     private static final String ARG_CALLBACK = "callback";
     private static final String ARG_EXERCISE = "exercise";
+    private static final String ARG_EXERCISES_EXIST = "exercisesExist";
     @BindView(R.id.exercise) EditText exerciseEditText;
     @BindView(R.id.sets) EditText setsEditText;
     @BindView(R.id.repetitions) EditText repetitionsEditText;
@@ -43,6 +44,7 @@ public class CreateExerciseDialogFragment extends DialogFragment {
     private @Exercise.MeasurementType int measurementType;
     private static final String LOG_TAG = CreateExerciseDialogFragment.class.getSimpleName();
     private Exercise mExercise;
+    private boolean mExercisesExist;
 
     private Unbinder unbinder;
     public interface CreateExerciseDialogFragmentListener extends Serializable {
@@ -52,9 +54,10 @@ public class CreateExerciseDialogFragment extends DialogFragment {
 
     private CreateExerciseDialogFragmentListener mCallback;
 
-    public static CreateExerciseDialogFragment newInstance(CreateExerciseDialogFragmentListener callback) {
+    public static CreateExerciseDialogFragment newInstance(boolean exercisesExist, CreateExerciseDialogFragmentListener callback) {
         Bundle b = new Bundle();
         b.putSerializable(ARG_CALLBACK, callback);
+        b.putBoolean(ARG_EXERCISES_EXIST, exercisesExist);
         CreateExerciseDialogFragment fragment = new CreateExerciseDialogFragment();
         fragment.setArguments(b);
         return fragment;
@@ -75,6 +78,7 @@ public class CreateExerciseDialogFragment extends DialogFragment {
         if (args != null) {
             mCallback = (CreateExerciseDialogFragmentListener) args.getSerializable(ARG_CALLBACK);
             mExercise = args.getParcelable(ARG_EXERCISE);
+            mExercisesExist = args.getBoolean(ARG_EXERCISES_EXIST, false);
         }
 
         //fill in the exercise if it was chosen from an existing exercise
@@ -114,13 +118,6 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                 .setIcon(R.drawable.ic_run_color_primary_24dp)
                 .setMessage(R.string.dialog_create_exercise_text)
                 .setView(rootView)
-                .setNeutralButton("Use existing exercise instead", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        mCallback.onSelectExisting();
-                        dismiss();
-                    }
-                })
                 .setPositiveButton(R.string.action_accept, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -135,6 +132,15 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                         dismiss();
                     }
                 });
+        if (mExercisesExist) {
+            builder.setNeutralButton(getString(R.string.dialog_use_existing_exercise), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    mCallback.onSelectExisting();
+                    dismiss();
+                }
+            });
+        }
         return builder.create();
     }
 

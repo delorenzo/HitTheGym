@@ -106,7 +106,6 @@ public class LoginActivity extends AppCompatActivity implements
         mGoogleSignInButton.setSize(SignInButton.SIZE_WIDE);
         mGoogleSignInButton.setScopes(gso.getScopeArray());
 
-
         //set up auth state listener
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -166,6 +165,8 @@ public class LoginActivity extends AppCompatActivity implements
                     handleGoogleSignInResult(result);
                 }
             });
+            //for some reason the google sign-on seems to hang on here and cause issues
+            signOut();
         }
     }
 
@@ -249,6 +250,8 @@ public class LoginActivity extends AppCompatActivity implements
                         Toast.LENGTH_SHORT).show();
             }
             FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Google sign in unsuccessful.  Code " + code);
+            //sometimes the google sign on seems to hang on, which is mitigated by manually signing out.
+            signOut();
         }
     }
 

@@ -130,6 +130,7 @@
     <string name="dialog_workout_complete_title">Workout Complete</string>
     <string name="dialog_workout_complete_text">You have completed this workout.  Nice work!</string>
     <string name="dialog_select_exercise_title">Select Exercise:</string>
+    <string name="dialog_use_existing_exercise">Use Existing</string>
 
     <!-- hint strings -->
     <string name="hint_workout_name">Routine Name</string>
