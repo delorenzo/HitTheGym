@@ -17,10 +17,25 @@
 
     <style name="AppTheme.AlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="android:textColorPrimary">@color/primary_text</item>
         <item name="android:background">@android:color/white</item>
         <item name="android:windowTitleStyle">@style/AppTheme.DialogTitle</item>
-        <item name="android:buttonBarNeutralButtonStyle">@style/AppTheme.DialogButtonNeutral</item>
+        <item name="buttonBarPositiveButtonStyle">@style/AppTheme.DialogButtonPositive</item>
+        <item name="buttonBarNegativeButtonStyle">@style/AppTheme.DialogButtonNegative</item>
+        <item name="buttonBarNeutralButtonStyle">@style/AppTheme.DialogButtonNeutral</item>
     </style>
 
+
+    <style name="AppTheme.DialogButtonNegative" parent="Base.Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.DialogButtonPositive" parent="Base.Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.DialogButtonNeutral" parent="Base.Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
 </resources>
