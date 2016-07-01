@@ -112,11 +112,7 @@ public class LoginActivity extends AppCompatActivity implements
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
-                    mFirebaseAnalytics.setUserId(user.getUid());
-                    //SyncAdapter.initializeSyncAdapter(getApplicationContext());
-
-                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(intent);
+                    onAuthSuccess(user);
                 }
             }
         };
@@ -165,15 +161,28 @@ public class LoginActivity extends AppCompatActivity implements
                     handleGoogleSignInResult(result);
                 }
             });
-            //for some reason the google sign-on seems to hang on here and cause issues
-            signOut();
         }
+    }
+
+    private void onAuthSuccess(FirebaseUser user) {
+        mFirebaseAnalytics.setUserId(user.getUid());
+        //SyncAdapter.initializeSyncAdapter(getApplicationContext());
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
+        // Check auth on Activity start
+        if (mAuth.getCurrentUser() != null) {
+            onAuthSuccess(mAuth.getCurrentUser());
+        }
+        else {
+            mAuth.addAuthStateListener(mAuthListener);
+        }
     }
 
     @Override
@@ -250,8 +259,6 @@ public class LoginActivity extends AppCompatActivity implements
                         Toast.LENGTH_SHORT).show();
             }
             FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Google sign in unsuccessful.  Code " + code);
-            //sometimes the google sign on seems to hang on, which is mitigated by manually signing out.
-            signOut();
         }
     }
 
