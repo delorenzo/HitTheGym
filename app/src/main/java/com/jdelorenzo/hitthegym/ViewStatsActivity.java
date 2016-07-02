@@ -80,6 +80,7 @@ public class ViewStatsActivity extends AppCompatActivity
             }
         });
         pagerTabStrip.setTabIndicatorColorResource(R.color.colorAccent);
+        ((ViewPager.LayoutParams) pagerTabStrip.getLayoutParams()).isDecor = true;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
