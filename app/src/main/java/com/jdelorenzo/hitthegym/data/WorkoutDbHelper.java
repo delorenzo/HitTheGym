@@ -8,7 +8,7 @@ import com.jdelorenzo.hitthegym.data.WorkoutContract.*;
 import com.jdelorenzo.hitthegym.model.Exercise;
 
 public class WorkoutDbHelper extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     static final String DATABASE_NAME = "workout.db";
 
@@ -102,6 +102,12 @@ public class WorkoutDbHelper extends SQLiteOpenHelper {
                     db.execSQL("CREATE TABLE exercise AS SELECT _id, repetitions, sets, description, measurement FROM exercise_orig");
                     db.execSQL("DROP TABLE IF EXISTS exercise_orig");
                     break;
+                case 4:
+                    //from version 2 to 3, the measurement_type column was mistakenly deleted
+                    db.execSQL("ALTER TABLE exercise RENAME to exercise_orig");
+                    db.execSQL("CREATE TABLE exercise AS SELECT * FROM exercise_orig");
+                    db.execSQL("ALTER TABLE exercise ADD COLUMN measurement_type INTEGER DEFAULT " + Exercise.MEASUREMENT_TYPE_WEIGHT);
+                    db.execSQL("DROP TABLE IF EXISTS exercise_orig");
             }
             upgradeTo++;
         }
