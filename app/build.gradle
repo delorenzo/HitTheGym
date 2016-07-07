@@ -8,8 +8,8 @@ android {
         applicationId "com.jdelorenzo.hitthegym"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
     }
     packagingOptions {
         exclude 'META-INF/LICENSE'
@@ -42,3 +42,5 @@ dependencies {
     compile 'com.jjoe64:graphview:4.0.1'
     compile 'joda-time:joda-time:2.9.4'
 }
+
+apply plugin: 'com.google.gms.google-services'
