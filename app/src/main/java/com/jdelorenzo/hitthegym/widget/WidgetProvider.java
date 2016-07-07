@@ -11,7 +11,7 @@ import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.jdelorenzo.hitthegym.LoginActivity;
+import com.jdelorenzo.hitthegym.MainActivity;
 import com.jdelorenzo.hitthegym.R;
 
 //Collection widget for the day's workout.
@@ -34,14 +34,14 @@ public class WidgetProvider extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.workout_widget);
 
-            //create the intent to login
-            Intent intent = new Intent(context, LoginActivity.class);
+            //create the intent to launch
+            Intent intent = new Intent(context, MainActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
             views.setOnClickPendingIntent(R.id.widget, pendingIntent);
 
             setRemoteAdapter(context, views);
 
-            Intent clickIntentTemplate = new Intent(context, LoginActivity.class);
+            Intent clickIntentTemplate = new Intent(context, MainActivity.class);
             PendingIntent clickPendingIntentTemplate = TaskStackBuilder.create(context)
                     .addNextIntentWithParentStack(clickIntentTemplate)
                     .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);

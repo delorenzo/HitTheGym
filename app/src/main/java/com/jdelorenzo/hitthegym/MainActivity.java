@@ -99,9 +99,6 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
-        else if (id == R.id.action_sign_out) {
-            signOut();
-        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -242,12 +239,6 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(Long id) {
             modifyWorkout(id);
         }
-    }
-
-    private void signOut() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setAction(LoginActivity.ACTION_LOGOUT);
-        startActivity(intent);
     }
 
     @Override
