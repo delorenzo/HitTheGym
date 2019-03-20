@@ -2,8 +2,8 @@ package com.jdelorenzo.hitthegym.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;

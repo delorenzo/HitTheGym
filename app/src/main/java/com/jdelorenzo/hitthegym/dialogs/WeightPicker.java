@@ -3,7 +3,7 @@ package com.jdelorenzo.hitthegym.dialogs;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;

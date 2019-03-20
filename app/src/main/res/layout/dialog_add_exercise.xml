@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:id="@+id/add_exercise_container">
-    <android.support.v7.widget.GridLayout
+    <androidx.gridlayout.widget.GridLayout
         app:alignmentMode="alignBounds"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingStart="@dimen/activity_horizontal_margin"
@@ -31,7 +31,7 @@
             android:paddingEnd="@dimen/dialog_text_horizontal_padding"
             android:layout_marginRight="@dimen/dialog_text_horizontal_margin"
             android:layout_marginEnd="@dimen/dialog_text_horizontal_margin" />
-        <android.support.v7.widget.AppCompatAutoCompleteTextView
+        <androidx.appcompat.widget.AppCompatAutoCompleteTextView
             android:layout_marginRight="@dimen/dialog_text_horizontal_margin"
             android:layout_marginEnd="@dimen/dialog_text_horizontal_margin"
             android:layout_marginLeft="@dimen/dialog_text_horizontal_margin"
@@ -42,13 +42,13 @@
             android:id="@+id/exercise"
             android:inputType="textAutoComplete"
             tools:context="Deadlifts"/>
-        <android.support.v7.widget.AppCompatSpinner
+        <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/measurement_selector"
             android:gravity="start"
             android:entries="@array/measurement"
             android:spinnerMode="dropdown"
             android:dropDownSelector="@color/colorAccent" />
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/measurement"
             android:gravity="center"
             android:hint="@string/weight"
@@ -70,7 +70,7 @@
             app:layout_gravity="fill_horizontal"
             android:id="@+id/repetitions_label"
             android:text="@string/dialog_reps_label" />
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/repetitions"
             android:gravity="center"
             app:layout_columnSpan="2"
@@ -90,12 +90,12 @@
             android:foregroundGravity="right"
             android:id="@+id/sets_label"
             android:text="@string/dialog_sets_label" />
-        <android.support.v7.widget.AppCompatEditText
+        <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/sets"
             app:layout_columnSpan="2"
             android:hint="@string/sets"
             android:text="@string/default_sets"
             android:gravity="center"
             android:inputType="number"/>
-    </android.support.v7.widget.GridLayout>
+    </androidx.gridlayout.widget.GridLayout>
 </FrameLayout>

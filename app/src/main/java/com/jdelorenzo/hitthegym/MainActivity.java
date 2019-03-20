@@ -9,10 +9,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
@@ -30,10 +30,12 @@ import com.jdelorenzo.hitthegym.dialogs.SelectRoutineDialogFragment;
 import java.util.List;
 import java.util.Locale;
 
+import butterknife.Action;
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.ViewCollections;
 
 public class MainActivity extends AppCompatActivity implements
         CreateRoutineDialogFragment.CreateRoutineDialogListener,
@@ -176,7 +178,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-    static final ButterKnife.Action<View> DISABLE = new ButterKnife.Action<View>() {
+    static final Action<View> DISABLE = new Action<View>() {
         @Override
         public void apply(@NonNull View view, int index) {
             view.setAlpha(0.2f);
@@ -218,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements
         @Override
         protected void onPostExecute(long[] result) {
             if (null == result || result.length == 0) {
-                 ButterKnife.apply(workoutButtons, DISABLE);
+                ViewCollections.run(workoutButtons, DISABLE);
             }
         }
     }

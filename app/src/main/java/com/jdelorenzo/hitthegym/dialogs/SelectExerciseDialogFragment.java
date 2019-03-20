@@ -4,17 +4,13 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.AppCompatSpinner;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatSpinner;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.SpinnerAdapter;
 
 import com.jdelorenzo.hitthegym.R;
-import com.jdelorenzo.hitthegym.Utility;
-import com.jdelorenzo.hitthegym.model.Exercise;
 
 import java.io.Serializable;
 
