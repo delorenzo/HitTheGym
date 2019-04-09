@@ -187,20 +187,6 @@
     <!-- sync strings -->
     <string name="sync_account_type" translatable="false">@string/app_name</string>
 
-    <!-- firebase analytics strings -->
-    <string name="analytics_sign_in_key" translatable="false">sign_in</string>
-    <string name="analytics_sign_in_none" translatable="false">none</string>
-    <string name="analytics_sign_in__google" translatable="false">google</string>
-    <string name="analytics_sign_in_facebook" translatable="false">facebook</string>
-    <string name="analytics_sign_in_email" translatable="false">email</string>
-    <string name="analytics_user_name" translatable="false">name</string>
-
-    <!-- firebase data strings -->
-    <string name="routines" translatable="false">routines</string>
-    <string name="exercises" translatable="false">exercises</string>
-    <string name="days" translatable="false">days</string>
-    <string name="weights" translatable="false">weights</string>
-
     <!-- toast strings -->
     <string name="toast_select_day">Please select a day first.</string>
 

@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatSpinner;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.jdelorenzo.hitthegym.R;
 import com.jdelorenzo.hitthegym.Utility;
 import com.jdelorenzo.hitthegym.model.Exercise;
@@ -161,35 +159,29 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                 public void onClick(View v) {
                     String description = exerciseEditText.getText().toString();
                     if (description.isEmpty()) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty description entered");
                         exerciseEditText.setError(getActivity().getString(R.string.error_message_exercise_name));
                         return;
                     }
                     else if (!description.matches(getString(R.string.regex_valid_name))) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Invalid exercise name " + description + " entered");
                         exerciseEditText.setError(getString(R.string.error_message_invalid_name));
                         return;
                     }
                     String setText = setsEditText.getText().toString();
                     if (setText.isEmpty()) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty sets entered");
                         setsEditText.setError(getActivity().getString(R.string.error_message_sets));
                         return;
                     }
                     else if (!setText.matches(getString(R.string.regex_valid_digit))) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Invalid set amount " + setText + " entered");
                         setsEditText.setError(getString(R.string.error_message_invalid_digit));
                         return;
                     }
                     int sets = Integer.parseInt(setText);
                     String repetitionText = repetitionsEditText.getText().toString();
                     if (repetitionText.isEmpty()) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty reps entered");
                         repetitionsEditText.setError(getActivity().getString(R.string.error_message_repetitions));
                         return;
                     }
                     else if (!repetitionText.matches(getString(R.string.regex_valid_digit))) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Invalid rep amount " + repetitionText + " entered");
                         repetitionsEditText.setError(getString(R.string.error_message_invalid_digit));
                         return;
                     }
@@ -197,13 +189,10 @@ public class CreateExerciseDialogFragment extends DialogFragment {
                     String measurementText = measurementEditText.getText().toString();
                     double measurement;
                     if (measurementText.isEmpty()) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty weight entered");
                         measurementEditText.setError(getString(R.string.error_message_field_required));
                         return;
                     }
                     if (!measurementText.matches(getString(R.string.regex_valid_decimal))) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG,
-                                "Invalid measurement " + measurementText + " entered.");
                         measurementEditText.setError(getString(R.string.error_message_invalid_measurement));
                         return;
                     }

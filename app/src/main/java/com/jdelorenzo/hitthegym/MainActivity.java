@@ -13,16 +13,12 @@ import androidx.annotation.NonNull;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.firebase.crash.FirebaseCrash;
 import com.jdelorenzo.hitthegym.data.WorkoutContract;
 import com.jdelorenzo.hitthegym.dialogs.CreateRoutineDialogFragment;
 import com.jdelorenzo.hitthegym.dialogs.SelectRoutineDialogFragment;
@@ -38,8 +34,7 @@ import butterknife.OnClick;
 import butterknife.ViewCollections;
 
 public class MainActivity extends AppCompatActivity implements
-        CreateRoutineDialogFragment.CreateRoutineDialogListener,
-                GoogleApiClient.OnConnectionFailedListener{
+        CreateRoutineDialogFragment.CreateRoutineDialogListener{
 
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindViews({R.id.button_work_out, R.id.button_edit_workout, R.id.button_view_stats}) List<Button> workoutButtons;
@@ -241,10 +236,5 @@ public class MainActivity extends AppCompatActivity implements
         protected void onPostExecute(Long id) {
             modifyWorkout(id);
         }
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        FirebaseCrash.logcat(Log.ERROR, LOG_TAG, "Google API Connection failed:  " + connectionResult.toString());
     }
 }

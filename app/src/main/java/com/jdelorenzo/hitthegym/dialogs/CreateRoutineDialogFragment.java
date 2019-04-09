@@ -6,13 +6,11 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import androidx.appcompat.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
 import com.jdelorenzo.hitthegym.R;
 
 import butterknife.BindView;
@@ -70,11 +68,9 @@ public class CreateRoutineDialogFragment extends DialogFragment {
                 public void onClick(View v) {
                     String name = nameEditText.getText().toString();
                     if (name.isEmpty()) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Empty routine name entered.");
                         nameEditText.setError(getString(R.string.error_message_empty_routine_name));
                         return;
                     } else if (!name.matches(getString(R.string.regex_valid_name))) {
-                        FirebaseCrash.logcat(Log.INFO, LOG_TAG, "Invalid name entered for routine:  " + name);
                         nameEditText.setError(getString(R.string.error_message_invalid_name));
                         return;
                     }
